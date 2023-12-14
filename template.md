@@ -533,4 +533,4 @@ These resources and references may be useful throughout your learning process.
 
 This is not an official Google project, nor is it affiliated with Google in any way.
 
-The software is distributed under the MIT License, which can be found at [https://github.com/gbaptista/gemini-ai/blob/main/LICENSE](https://github.com/gbaptista/gemini-ai/blob/main/LICENSE). This license includes a disclaimer of warranty. Moreover, the authors assume no responsibility for any damage or costs that may result from using this project. Use the Gemini AI Ruby Gem at your own risk.
+This software is distributed under the [MIT License](https://github.com/gbaptista/gemini-ai/blob/main/LICENSE). This license includes a disclaimer of warranty. Moreover, the authors assume no responsibility for any damage or costs that may result from using this project. Use the Gemini AI Ruby Gem at your own risk.
