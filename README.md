@@ -4,6 +4,8 @@ A Ruby Gem for interacting with [Gemini](https://deepmind.google/technologies/ge
 
 > _This Gem is designed to provide low-level access to Gemini, enabling people to build abstractions on top of it. If you are interested in more high-level abstractions or more user-friendly tools, you may want to consider [Nano Bots](https://github.com/icebaker/ruby-nano-bots) 💎 🤖._
 
+![The logo shows a gemstone split into red and blue halves, symbolizing Ruby programming and Gemini AI. It's surrounded by a circuit-like design on a dark blue backdrop.](https://raw.githubusercontent.com/gbaptista/assets/main/gemini-ai/ruby-gemini-ai.png)
+
 ## TL;DR and Quick Start
 
 ```ruby
