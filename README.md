@@ -505,6 +505,12 @@ gem push gemini-ai-1.0.0.gem
 
 ### Updating the README
 
+Install [Babashka](https://babashka.org):
+
+```sh
+curl -s https://raw.githubusercontent.com/babashka/babashka/master/install | sudo bash
+```
+
 Update the `template.md` file and then:
 
 ```sh
