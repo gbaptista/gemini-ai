@@ -3,10 +3,10 @@
 module Gemini
   GEM = {
     name: 'gemini-ai',
-    version: '1.0.0',
+    version: '2.0.0',
     author: 'gbaptista',
     summary: "Interact with Google's Gemini AI.",
-    description: "A Ruby Gem for interacting with Gemini through Vertex AI, Google's generative AI service.",
+    description: "A Ruby Gem for interacting with Gemini through Vertex AI or AI Studio, Google's generative AI services.",
     github: 'https://github.com/gbaptista/gemini-ai',
     gem_server: 'https://rubygems.org',
     license: 'MIT',
