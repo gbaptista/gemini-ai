@@ -9,14 +9,27 @@ module Gemini
   module Controllers
     class Client
       def initialize(config)
-        @authorizer = ::Google::Auth::ServiceAccountCredentials.make_creds(
-          json_key_io: File.open(config[:credentials][:file_path]),
-          scope: 'https://www.googleapis.com/auth/cloud-platform'
-        )
+        if config[:credentials][:api_key]
+          @authentication = :api_key
+          @api_key = config[:credentials][:api_key]
+        else
+          @authentication = :service_account
+          @authorizer = ::Google::Auth::ServiceAccountCredentials.make_creds(
+            json_key_io: File.open(config[:credentials][:file_path]),
+            scope: 'https://www.googleapis.com/auth/cloud-platform'
+          )
+        end
 
-        @address = "https://#{config[:credentials][:region]}-aiplatform.googleapis.com/v1/projects/#{config[:credentials][:project_id]}/locations/#{config[:credentials][:region]}/publishers/google/models/#{config[:settings][:model]}"
+        @address = case config[:credentials][:service]
+                   when 'vertex-ai-api'
+                     "https://#{config[:credentials][:region]}-aiplatform.googleapis.com/v1/projects/#{config[:credentials][:project_id]}/locations/#{config[:credentials][:region]}/publishers/google/models/#{config[:options][:model]}"
+                   when 'generative-language-api'
+                     "https://generativelanguage.googleapis.com/v1/models/#{config[:options][:model]}"
+                   else
+                     raise StandardError, "Unsupported service: #{config[:credentials][:service]}"
+                   end
 
-        @stream = config[:settings][:stream]
+        @stream = config[:options][:stream]
       end
 
       def stream_generate_content(payload, stream: nil, &callback)
@@ -26,7 +39,12 @@ module Gemini
       def request(path, payload, stream: nil, &callback)
         stream_enabled = stream.nil? ? @stream : stream
         url = "#{@address}:#{path}"
-        url += '?alt=sse' if stream_enabled
+        params = []
+
+        params << 'alt=sse' if stream_enabled
+        params << "key=#{@api_key}" if @authentication == :api_key
+
+        url += "?#{params.join('&')}" if params.size.positive?
 
         if !callback.nil? && !stream_enabled
           raise StandardError, 'You are trying to use a block without stream enabled."'
@@ -37,7 +55,10 @@ module Gemini
         response = Faraday.new.post do |request|
           request.url url
           request.headers['Content-Type'] = 'application/json'
-          request.headers['Authorization'] = "Bearer #{@authorizer.fetch_access_token!['access_token']}"
+          if @authentication == :service_account
+            request.headers['Authorization'] = "Bearer #{@authorizer.fetch_access_token!['access_token']}"
+          end
+
           request.body = payload.to_json
 
           if stream_enabled

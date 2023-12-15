@@ -1,10 +1,10 @@
 # Gemini AI
 
-A Ruby Gem for interacting with [Gemini](https://deepmind.google/technologies/gemini/) through [Vertex AI](https://cloud.google.com/vertex-ai), Google's generative AI service.
-
-> _This Gem is designed to provide low-level access to Gemini, enabling people to build abstractions on top of it. If you are interested in more high-level abstractions or more user-friendly tools, you may want to consider [Nano Bots](https://github.com/icebaker/ruby-nano-bots) 💎 🤖._
+A Ruby Gem for interacting with [Gemini](https://deepmind.google/technologies/gemini/) through [Vertex AI](https://cloud.google.com/vertex-ai) or [AI Studio](https://makersuite.google.com), Google's generative AI services.
 
 ![The logo shows a gemstone split into red and blue halves, symbolizing Ruby programming and Gemini AI. It's surrounded by a circuit-like design on a dark blue backdrop.](https://raw.githubusercontent.com/gbaptista/assets/main/gemini-ai/ruby-gemini-ai.png)
+
+> _This Gem is designed to provide low-level access to Gemini, enabling people to build abstractions on top of it. If you are interested in more high-level abstractions or more user-friendly tools, you may want to consider [Nano Bots](https://github.com/icebaker/ruby-nano-bots) 💎 🤖._
 
 ## TL;DR and Quick Start
 
@@ -15,9 +15,24 @@ gem 'gemini-ai', '~> 1.0'
 ```ruby
 require 'gemini-ai'
 
+# With an API key
 client = Gemini.new(
-  credentials: { file_path: 'google-credentials.json', project_id: 'PROJECT_ID', region: 'us-east4' },
-  settings: { model: 'gemini-pro', stream: false }
+  credentials: {
+    service: 'generative-language-api',
+    api_key: ENV['GOOGLE_API_KEY']
+  },
+  options: { model: 'gemini-pro', stream: false }
+)
+
+# With a Service Account
+client = Gemini.new(
+  credentials: {
+    service: 'vertex-ai-api',
+    file_path: 'google-credentials.json',
+    project_id: 'PROJECT_ID',
+    region: 'us-east4'
+  },
+  options: { model: 'gemini-pro', stream: false }
 )
 
 result = client.stream_generate_content({
@@ -50,7 +65,10 @@ Result:
 - [TL;DR and Quick Start](#tldr-and-quick-start)
 - [Index](#index)
 - [Setup](#setup)
+    - [Installing](#installing)
     - [Credentials](#credentials)
+        - [Option 1: API Key](#option-1-api-key)
+        - [Option 2: Service Account](#option-2-service-account)
         - [Required Data](#required-data)
 - [Usage](#usage)
     - [Client](#client)
@@ -70,6 +88,8 @@ Result:
 
 ## Setup
 
+### Installing
+
 ```sh
 gem install gemini-ai -v 1.0.0
 ```
@@ -81,6 +101,17 @@ gem 'gemini-ai', '~> 1.0'
 ### Credentials
 
 > ⚠️ DISCLAIMER: Be careful with what you are doing, and never trust others' code related to this. These commands and instructions alter the level of access to your Google Cloud Account, and running them naively can lead to security risks as well as financial risks. People with access to your account can use it to steal data or incur charges. Run these commands at your own responsibility and due diligence; expect no warranties from the contributors of this project.
+
+#### Option 1: API Key
+
+You need a [Google Cloud](https://console.cloud.google.com) [_Project_](https://cloud.google.com/resource-manager/docs/creating-managing-projects), and then you can generate an API Key through the Google Cloud Console [here](https://console.cloud.google.com/apis/credentials).
+
+You also need to enable the _Generative Language API_ service in your Google Cloud Console, which can be done [here](https://console.cloud.google.com/apis/library/generativelanguage.googleapis.com).
+
+
+Alternatively, you can generate an API Key through _Google AI Studio_ [here](https://makersuite.google.com/app/apikey). However, this approach will automatically create a project for you in your Google Cloud Account.
+
+#### Option 2: Service Account
 
 You need a [Google Cloud](https://console.cloud.google.com) [_Project_](https://cloud.google.com/resource-manager/docs/creating-managing-projects) and a [_Service Account_](https://cloud.google.com/iam/docs/service-account-overview) to use [Vertex AI](https://cloud.google.com/vertex-ai) API.
 
@@ -134,14 +165,33 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
   --role='roles/ml.admin'
 ```
 
-> ⚠️ DISCLAIMER: Be careful with what you are doing, and never trust others' code related to this. These commands and instructions alter the level of access to your Google Cloud Account, and running them naively can lead to security risks as well as financial risks. People with access to your account can use it to steal data or incur charges. Run these commands at your own responsibility and due diligence; expect no warranties from the contributors of this project.
-
 #### Required Data
 
-After this, you should have all the necessary data and access to use Gemini: a `google-credentials.json` file, a `PROJECT_ID`, and a `REGION`:
+After choosing an option, you should have all the necessary data and access to use Gemini.
+
+For API Key:
 
 ```ruby
 {
+  service: 'generative-language-api',
+  api_key: 'GOOGLE_API_KEY'
+}
+```
+
+Remember that hardcoding your API key in code is unsafe; it's preferable to use environment variables:
+
+```ruby
+{
+  service: 'generative-language-api',
+  api_key: ENV['GOOGLE_API_KEY']
+}
+```
+
+Alternativelly, for Service Account, a `google-credentials.json` file, a `PROJECT_ID`, and a `REGION`:
+
+```ruby
+{
+  service: 'vertex-ai-api',
   file_path: 'google-credentials.json',
   project_id: 'PROJECT_ID',
   region: 'us-east4'
@@ -171,9 +221,24 @@ Create a new client:
 ```ruby
 require 'gemini-ai'
 
+# With an API key
 client = Gemini.new(
-  credentials: { file_path: 'google-credentials.json', project_id: 'PROJECT_ID', region: 'us-east4' },
-  settings: { model: 'gemini-pro', stream: false }
+  credentials: {
+    service: 'generative-language-api',
+    api_key: ENV['GOOGLE_API_KEY']
+  },
+  options: { model: 'gemini-pro', stream: false }
+)
+
+# With a Service Account
+client = Gemini.new(
+  credentials: {
+    service: 'vertex-ai-api',
+    file_path: 'google-credentials.json',
+    project_id: 'PROJECT_ID',
+    region: 'us-east4'
+  },
+  options: { model: 'gemini-pro', stream: false }
 )
 ```
 
@@ -212,8 +277,8 @@ Result:
 You can set up the client to use streaming for all supported endpoints:
 ```ruby
 client = Gemini.new(
-  credentials: { file_path: 'google-credentials.json', project_id: 'PROJECT_ID', region: 'us-east4' },
-  settings: { model: 'gemini-pro', stream: true }
+  credentials: { ... },
+  options: { model: 'gemini-pro', stream: true }
 )
 ```
 
@@ -540,6 +605,8 @@ mlp README.md -p 8076
 
 These resources and references may be useful throughout your learning process.
 
+- [Google AI for Developers](https://ai.google.dev)
+- [Get started with the Gemini API ](https://ai.google.dev/docs)
 - [Getting Started with the Vertex AI Gemini API with cURL](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/gemini/getting-started/intro_gemini_curl.ipynb)
 - [Gemini API Documentation](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini)
 - [Vertex AI API Documentation](https://cloud.google.com/vertex-ai/docs/reference)
