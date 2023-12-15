@@ -80,7 +80,7 @@ gem 'gemini-ai', '~> 2.0'
 
 > ⚠️ DISCLAIMER: Be careful with what you are doing, and never trust others' code related to this. These commands and instructions alter the level of access to your Google Cloud Account, and running them naively can lead to security risks as well as financial risks. People with access to your account can use it to steal data or incur charges. Run these commands at your own responsibility and due diligence; expect no warranties from the contributors of this project.
 
-#### Option 1: API Key
+#### Option 1: API Key (Generative Language API)
 
 You need a [Google Cloud](https://console.cloud.google.com) [_Project_](https://cloud.google.com/resource-manager/docs/creating-managing-projects), and then you can generate an API Key through the Google Cloud Console [here](https://console.cloud.google.com/apis/credentials).
 
@@ -89,7 +89,7 @@ You also need to enable the _Generative Language API_ service in your Google Clo
 
 Alternatively, you can generate an API Key through _Google AI Studio_ [here](https://makersuite.google.com/app/apikey). However, this approach will automatically create a project for you in your Google Cloud Account.
 
-#### Option 2: Service Account
+#### Option 2: Service Account (Vertex AI API)
 
 You need a [Google Cloud](https://console.cloud.google.com) [_Project_](https://cloud.google.com/resource-manager/docs/creating-managing-projects) and a [_Service Account_](https://cloud.google.com/iam/docs/service-account-overview) to use [Vertex AI](https://cloud.google.com/vertex-ai) API.
 
@@ -373,7 +373,7 @@ Result:
 
 ### Tools (Functions) Calling
 
-> As of the writing of this README, only the `gemini-pro` model [supports](https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/function-calling#supported_models) tools (functions) calls.
+> As of the writing of this README, only the `vertex-ai-api` service and the `gemini-pro` model [supports](https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/function-calling#supported_models) tools (functions) calls.
 
 You can provide specifications for [tools (functions)](https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/function-calling) using [JSON Schema](https://json-schema.org) to generate potential calls to them:
 
