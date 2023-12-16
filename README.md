@@ -85,6 +85,7 @@ Result:
         - [Modes](#modes)
             - [Text](#text)
             - [Image](#image)
+            - [Video](#video)
         - [Synchronous](#synchronous)
         - [Streaming](#streaming)
         - [Streaming Hang](#streaming-hang)
@@ -384,7 +385,66 @@ The result:
        { 'category' => 'HARM_CATEGORY_SEXUALLY_EXPLICIT', 'probability' => 'NEGLIGIBLE' },
        { 'category' => 'HARM_CATEGORY_DANGEROUS_CONTENT', 'probability' => 'NEGLIGIBLE' }] }],
    'usageMetadata' => { 'promptTokenCount' => 263, 'candidatesTokenCount' => 50, 'totalTokenCount' => 313 } }]
+```
 
+##### Video
+
+https://gist.github.com/assets/29520/f82bccbf-02d2-4899-9c48-eb8a0a5ef741
+
+> ALT: A white and gold cup is being filled with coffee. The coffee is dark and rich. The cup is sitting on a black surface. The background is blurred.
+
+> _Courtesy of [Pixabay](https://www.pexels.com/video/pouring-of-coffee-855391/)_
+
+Switch to the `gemini-pro-vision` model:
+
+```ruby
+client = Gemini.new(
+  credentials: { service: 'vertex-ai-api', region: 'us-east4' },
+  options: { model: 'gemini-pro-vision', stream: true }
+)
+```
+
+Then, encode the video as [Base64](https://en.wikipedia.org/wiki/Base64) and add its [MIME type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types):
+
+```ruby
+require 'base64'
+
+result = client.stream_generate_content(
+  { contents: [
+    { role: 'user', parts: [
+      { text: 'Please describe this video.' },
+      { inline_data: {
+        mime_type: 'video/mp4',
+        data: Base64.strict_encode64(File.read('coffee.mp4'))
+      } }
+    ] }
+  ] }
+)
+```
+
+The result:
+```ruby
+[{"candidates"=>
+   [{"content"=>
+      {"role"=>"model",
+       "parts"=>
+        [{"text"=>
+           " A white and gold cup is being filled with coffee. The coffee is dark and rich. The cup is sitting on a black surface. The background is blurred"}]},
+     "safetyRatings"=>
+      [{"category"=>"HARM_CATEGORY_HARASSMENT", "probability"=>"NEGLIGIBLE"},
+       {"category"=>"HARM_CATEGORY_HATE_SPEECH", "probability"=>"NEGLIGIBLE"},
+       {"category"=>"HARM_CATEGORY_SEXUALLY_EXPLICIT", "probability"=>"NEGLIGIBLE"},
+       {"category"=>"HARM_CATEGORY_DANGEROUS_CONTENT", "probability"=>"NEGLIGIBLE"}]}],
+  "usageMetadata"=>{"promptTokenCount"=>1037, "candidatesTokenCount"=>31, "totalTokenCount"=>1068}},
+ {"candidates"=>
+   [{"content"=>{"role"=>"model", "parts"=>[{"text"=>"."}]},
+     "finishReason"=>"STOP",
+     "safetyRatings"=>
+      [{"category"=>"HARM_CATEGORY_HARASSMENT", "probability"=>"NEGLIGIBLE"},
+       {"category"=>"HARM_CATEGORY_HATE_SPEECH", "probability"=>"NEGLIGIBLE"},
+       {"category"=>"HARM_CATEGORY_SEXUALLY_EXPLICIT", "probability"=>"NEGLIGIBLE"},
+       {"category"=>"HARM_CATEGORY_DANGEROUS_CONTENT", "probability"=>"NEGLIGIBLE"}]}],
+  "usageMetadata"=>{"promptTokenCount"=>1037, "candidatesTokenCount"=>32, "totalTokenCount"=>1069}}]
 ```
 
 #### Synchronous
