@@ -23,9 +23,19 @@ module Gemini
           @authorizer = ::Google::Auth.get_application_default
         end
 
+        if @authentication == :service_account || @authentication == :default_credentials
+          @project_id = if config[:credentials][:project_id].nil?
+                          @authorizer.project_id || @authorizer.quota_project_id
+                        else
+                          config[:credentials][:project_id]
+                        end
+
+          raise StandardError, 'Could not determine project_id, which is required.' if @project_id.nil?
+        end
+
         @address = case config[:credentials][:service]
                    when 'vertex-ai-api'
-                     "https://#{config[:credentials][:region]}-aiplatform.googleapis.com/v1/projects/#{config[:credentials][:project_id]}/locations/#{config[:credentials][:region]}/publishers/google/models/#{config[:options][:model]}"
+                     "https://#{config[:credentials][:region]}-aiplatform.googleapis.com/v1/projects/#{@project_id}/locations/#{config[:credentials][:region]}/publishers/google/models/#{config[:options][:model]}"
                    when 'generative-language-api'
                      "https://generativelanguage.googleapis.com/v1/models/#{config[:options][:model]}"
                    else
