@@ -273,6 +273,83 @@ client = Gemini.new(
 
 ### Generate Content
 
+#### Modes
+
+##### Text
+
+```ruby
+result = client.stream_generate_content({
+  contents: { role: 'user', parts: { text: 'hi!' } }
+})
+```
+
+Result:
+```ruby
+[{ 'candidates' =>
+   [{ 'content' => {
+        'role' => 'model',
+        'parts' => [{ 'text' => 'Hello! How may I assist you?' }]
+      },
+      'finishReason' => 'STOP',
+      'safetyRatings' =>
+      [{ 'category' => 'HARM_CATEGORY_HARASSMENT', 'probability' => 'NEGLIGIBLE' },
+       { 'category' => 'HARM_CATEGORY_HATE_SPEECH', 'probability' => 'NEGLIGIBLE' },
+       { 'category' => 'HARM_CATEGORY_SEXUALLY_EXPLICIT', 'probability' => 'NEGLIGIBLE' },
+       { 'category' => 'HARM_CATEGORY_DANGEROUS_CONTENT', 'probability' => 'NEGLIGIBLE' }] }],
+   'usageMetadata' => {
+     'promptTokenCount' => 2,
+     'candidatesTokenCount' => 8,
+     'totalTokenCount' => 10
+   } }]
+```
+
+##### Image
+
+![A black and white image of an old piano. The piano is an upright model, with the keys on the right side of the image. The piano is sitting on a tiled floor. There is a small round object on the top of the piano.](https://raw.githubusercontent.com/gbaptista/assets/main/gemini-ai/piano.jpg)
+
+> _Courtesy of [Unsplash](https://unsplash.com/photos/greyscale-photo-of-grand-piano-czPs0z3-Ggg)_
+
+```ruby
+require 'base64'
+
+result = client.stream_generate_content(
+  { contents: [
+    { role: 'user', parts: [
+      { text: 'Please describe this image.' },
+      { inline_data: {
+        mime_type: 'image/jpeg',
+        data: Base64.strict_encode64(File.read('piano.jpg'))
+      } }
+    ] }
+  ] }
+)
+```
+
+The result:
+```ruby
+[{ 'candidates' =>
+   [{ 'content' =>
+      { 'role' => 'model',
+        'parts' =>
+        [{ 'text' =>
+           ' A black and white image of an old piano. The piano is an upright model, with the keys on the right side of the image. The piano is' }] },
+      'safetyRatings' =>
+      [{ 'category' => 'HARM_CATEGORY_HARASSMENT', 'probability' => 'NEGLIGIBLE' },
+       { 'category' => 'HARM_CATEGORY_HATE_SPEECH', 'probability' => 'NEGLIGIBLE' },
+       { 'category' => 'HARM_CATEGORY_SEXUALLY_EXPLICIT', 'probability' => 'NEGLIGIBLE' },
+       { 'category' => 'HARM_CATEGORY_DANGEROUS_CONTENT', 'probability' => 'NEGLIGIBLE' }] }] },
+ { 'candidates' =>
+   [{ 'content' => { 'role' => 'model', 'parts' => [{ 'text' => ' sitting on a tiled floor. There is a small round object on the top of the piano.' }] },
+      'finishReason' => 'STOP',
+      'safetyRatings' =>
+      [{ 'category' => 'HARM_CATEGORY_HARASSMENT', 'probability' => 'NEGLIGIBLE' },
+       { 'category' => 'HARM_CATEGORY_HATE_SPEECH', 'probability' => 'NEGLIGIBLE' },
+       { 'category' => 'HARM_CATEGORY_SEXUALLY_EXPLICIT', 'probability' => 'NEGLIGIBLE' },
+       { 'category' => 'HARM_CATEGORY_DANGEROUS_CONTENT', 'probability' => 'NEGLIGIBLE' }] }],
+   'usageMetadata' => { 'promptTokenCount' => 263, 'candidatesTokenCount' => 50, 'totalTokenCount' => 313 } }]
+
+```
+
 #### Synchronous
 
 ```ruby
