@@ -725,6 +725,58 @@ result = client.request(
 )
 ```
 
+### Error Handling
+
+#### Rescuing
+
+```ruby
+require 'gemini-ai'
+
+begin
+  client.stream_generate_content({
+    contents: { role: 'user', parts: { text: 'hi!' } }
+  })
+rescue Gemini::Errors::GeminiError => error
+  puts error.class # Gemini::Errors::RequestError
+  puts error.message # 'the server responded with status 500'
+
+  puts error.payload
+  # { contents: [{ role: 'user', parts: { text: 'hi!' } }],
+  #   generationConfig: { candidateCount: 1 },
+  #   ...
+  # }
+
+  puts error.request
+  # #<Faraday::ServerError response={:status=>500, :headers...
+end
+```
+
+#### For Short
+
+```ruby
+require 'gemini-ai/errors'
+
+begin
+  client.stream_generate_content({
+    contents: { role: 'user', parts: { text: 'hi!' } }
+  })
+rescue GeminiError => error
+  puts error.class # Gemini::Errors::RequestError
+end
+```
+
+#### Errors
+
+```ruby
+GeminiError
+
+MissingProjectIdError
+UnsupportedServiceError
+BlockWithoutStreamError
+
+RequestError
+```
+
 ## Development
 
 ```bash

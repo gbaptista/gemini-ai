@@ -5,6 +5,8 @@ require 'faraday'
 require 'json'
 require 'googleauth'
 
+require_relative '../components/errors'
+
 module Gemini
   module Controllers
     class Client
@@ -30,7 +32,7 @@ module Gemini
                           config[:credentials][:project_id]
                         end
 
-          raise StandardError, 'Could not determine project_id, which is required.' if @project_id.nil?
+          raise MissingProjectIdError, 'Could not determine project_id, which is required.' if @project_id.nil?
         end
 
         @address = case config[:credentials][:service]
@@ -39,7 +41,7 @@ module Gemini
                    when 'generative-language-api'
                      "https://generativelanguage.googleapis.com/v1/models/#{config[:options][:model]}"
                    else
-                     raise StandardError, "Unsupported service: #{config[:credentials][:service]}"
+                     raise UnsupportedServiceError, "Unsupported service: #{config[:credentials][:service]}"
                    end
 
         @stream = config[:options][:stream]
@@ -60,12 +62,14 @@ module Gemini
         url += "?#{params.join('&')}" if params.size.positive?
 
         if !callback.nil? && !stream_enabled
-          raise StandardError, 'You are trying to use a block without stream enabled."'
+          raise BlockWithoutStreamError, 'You are trying to use a block without stream enabled.'
         end
 
         results = []
 
-        response = Faraday.new.post do |request|
+        response = Faraday.new do |faraday|
+          faraday.response :raise_error
+        end.post do |request|
           request.url url
           request.headers['Content-Type'] = 'application/json'
           if @authentication == :service_account || @authentication == :default_credentials
@@ -106,6 +110,8 @@ module Gemini
         return safe_parse_json(response.body) unless stream_enabled
 
         results.map { |result| result[:event] }
+      rescue Faraday::ServerError => e
+        raise RequestError.new(e.message, request: e, payload:)
       end
 
       def safe_parse_json(raw)
