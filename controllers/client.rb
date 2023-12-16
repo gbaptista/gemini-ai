@@ -20,8 +20,7 @@ module Gemini
           )
         else
           @authentication = :default_credentials
-          scopes = ["https://www.googleapis.com/auth/cloud-platform"]
-          @authorizer = ::Google::Auth.get_application_default(scopes)
+          @authorizer = ::Google::Auth.get_application_default
         end
 
         @address = case config[:credentials][:service]
