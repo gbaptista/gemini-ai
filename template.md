@@ -24,11 +24,21 @@ client = Gemini.new(
   options: { model: 'gemini-pro', stream: false }
 )
 
-# With a Service Account
+# With a Service Account Credentials File
 client = Gemini.new(
   credentials: {
     service: 'vertex-ai-api',
     file_path: 'google-credentials.json',
+    project_id: 'PROJECT_ID',
+    region: 'us-east4'
+  },
+  options: { model: 'gemini-pro', stream: false }
+)
+
+# With Application Default Credentials
+client = Gemini.new(
+  credentials: {
+    service: 'vertex-ai-api',
     project_id: 'PROJECT_ID',
     region: 'us-east4'
   },
@@ -89,7 +99,7 @@ You also need to enable the _Generative Language API_ service in your Google Clo
 
 Alternatively, you can generate an API Key through _Google AI Studio_ [here](https://makersuite.google.com/app/apikey). However, this approach will automatically create a project for you in your Google Cloud Account.
 
-#### Option 2: Service Account (Vertex AI API)
+#### Option 2: Service Account Credentials File (Vertex AI API)
 
 You need a [Google Cloud](https://console.cloud.google.com) [_Project_](https://cloud.google.com/resource-manager/docs/creating-managing-projects) and a [_Service Account_](https://cloud.google.com/iam/docs/service-account-overview) to use [Vertex AI](https://cloud.google.com/vertex-ai) API.
 
@@ -143,11 +153,21 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
   --role='roles/ml.admin'
 ```
 
+#### Option 3: Application Default Credentials (Vertex AI API)
+
+Similar to [Option 2](#option-2-service-account-credentials-file-vertex-ai-api), but you don't need to download a `google-credentials.json`. [_Application Default Credentials_](https://cloud.google.com/docs/authentication/application-default-credentials) automatically find credentials based on the application environment.
+
+For local development, you can generate your default credentials using the [gcloud CLI](https://cloud.google.com/sdk/gcloud) as follows:
+
+```sh
+gcloud auth application-default login 
+```
+
 #### Required Data
 
 After choosing an option, you should have all the necessary data and access to use Gemini.
 
-For API Key:
+**Option 1**, for API Key:
 
 ```ruby
 {
@@ -165,12 +185,22 @@ Remember that hardcoding your API key in code is unsafe; it's preferable to use 
 }
 ```
 
-Alternativelly, for Service Account, a `google-credentials.json` file, a `PROJECT_ID`, and a `REGION`:
+**Option 2**, for the Service Account, a `google-credentials.json` file, a `PROJECT_ID`, and a `REGION`:
 
 ```ruby
 {
   service: 'vertex-ai-api',
   file_path: 'google-credentials.json',
+  project_id: 'PROJECT_ID',
+  region: 'us-east4'
+}
+```
+
+**Option 3**: For _Application Default Credentials_, omit both the `api_key` and the `file_path`:
+
+```ruby
+{
+  service: 'vertex-ai-api',
   project_id: 'PROJECT_ID',
   region: 'us-east4'
 }
@@ -208,11 +238,21 @@ client = Gemini.new(
   options: { model: 'gemini-pro', stream: false }
 )
 
-# With a Service Account
+# With a Service Account Credentials File
 client = Gemini.new(
   credentials: {
     service: 'vertex-ai-api',
     file_path: 'google-credentials.json',
+    project_id: 'PROJECT_ID',
+    region: 'us-east4'
+  },
+  options: { model: 'gemini-pro', stream: false }
+)
+
+# With Application Default Credentials
+client = Gemini.new(
+  credentials: {
+    service: 'vertex-ai-api',
     project_id: 'PROJECT_ID',
     region: 'us-east4'
   },
