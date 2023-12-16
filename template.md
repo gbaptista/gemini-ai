@@ -457,7 +457,7 @@ Result:
    } }]
 ```
 
-### Back-and-Forth Conversations
+#### Back-and-Forth Conversations
 
 To maintain a back-and-forth conversation, you need to append the received responses and build a history for your requests:
 
@@ -499,7 +499,7 @@ Result:
    } }]
 ```
 
-### Tools (Functions) Calling
+#### Tools (Functions) Calling
 
 > As of the writing of this README, only the `vertex-ai-api` service and the `gemini-pro` model [supports](https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/function-calling#supported_models) tools (functions) calls.
 
