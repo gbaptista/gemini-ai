@@ -18,11 +18,9 @@ module Gemini
             json_key_io: File.open(config[:credentials][:file_path]),
             scope: 'https://www.googleapis.com/auth/cloud-platform'
           )
-          @project_id = @authorizer.project_id || @authorizer.quota_project_id
         else
           @authentication = :default_credentials
           @authorizer = ::Google::Auth.get_application_default
-          @project_id = @authorizer.project_id || @authorizer.quota_project_id
         end
 
         if @authentication == :service_account || @authentication == :default_credentials
