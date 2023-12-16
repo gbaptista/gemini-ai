@@ -309,6 +309,17 @@ Result:
 
 > _Courtesy of [Unsplash](https://unsplash.com/photos/greyscale-photo-of-grand-piano-czPs0z3-Ggg)_
 
+Switch to the `gemini-pro-vision` model:
+
+```ruby
+client = Gemini.new(
+  credentials: { service: 'vertex-ai-api', region: 'us-east4' },
+  options: { model: 'gemini-pro-vision', stream: true }
+)
+```
+
+Then, encode the image as [Base64](https://en.wikipedia.org/wiki/Base64) and add its [MIME type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types):
+
 ```ruby
 require 'base64'
 
