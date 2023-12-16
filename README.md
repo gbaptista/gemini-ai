@@ -393,7 +393,7 @@ https://gist.github.com/assets/29520/f82bccbf-02d2-4899-9c48-eb8a0a5ef741
 
 > ALT: A white and gold cup is being filled with coffee. The coffee is dark and rich. The cup is sitting on a black surface. The background is blurred.
 
-> _Courtesy of [Pixabay](https://www.pexels.com/video/pouring-of-coffee-855391/)_
+> _Courtesy of [Pexels](https://www.pexels.com/video/pouring-of-coffee-855391/)_
 
 Switch to the `gemini-pro-vision` model:
 
