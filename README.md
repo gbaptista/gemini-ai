@@ -184,6 +184,9 @@ For local development, you can generate your default credentials using the [gclo
 gcloud auth application-default login 
 ```
 
+For more details about alternative methods and different environments, check the official documentation:
+[Set up Application Default Credentials](https://cloud.google.com/docs/authentication/provide-credentials-adc)
+
 #### Required Data
 
 After choosing an option, you should have all the necessary data and access to use Gemini.
