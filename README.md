@@ -29,7 +29,6 @@ client = Gemini.new(
   credentials: {
     service: 'vertex-ai-api',
     file_path: 'google-credentials.json',
-    project_id: 'PROJECT_ID',
     region: 'us-east4'
   },
   options: { model: 'gemini-pro', stream: false }
@@ -39,7 +38,6 @@ client = Gemini.new(
 client = Gemini.new(
   credentials: {
     service: 'vertex-ai-api',
-    project_id: 'PROJECT_ID',
     region: 'us-east4'
   },
   options: { model: 'gemini-pro', stream: false }
@@ -208,13 +206,12 @@ Remember that hardcoding your API key in code is unsafe; it's preferable to use 
 }
 ```
 
-**Option 2**, for the Service Account, a `google-credentials.json` file, a `PROJECT_ID`, and a `REGION`:
+**Option 2**: For the Service Account, provide a `google-credentials.json` file and a `REGION`:
 
 ```ruby
 {
   service: 'vertex-ai-api',
   file_path: 'google-credentials.json',
-  project_id: 'PROJECT_ID',
   region: 'us-east4'
 }
 ```
@@ -224,7 +221,6 @@ Remember that hardcoding your API key in code is unsafe; it's preferable to use 
 ```ruby
 {
   service: 'vertex-ai-api',
-  project_id: 'PROJECT_ID',
   region: 'us-east4'
 }
 ```
@@ -242,6 +238,15 @@ Tokyo, Japan (asia-northeast1)
 ```
 
 You can follow here if new regions are available: [Gemini API](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini)
+
+You might want to explicitly set a Google Cloud Project ID, which you can do as follows:
+
+```ruby
+{
+  service: 'vertex-ai-api',
+  project_id: 'PROJECT_ID'
+}
+```
 
 ## Usage
 
@@ -266,7 +271,6 @@ client = Gemini.new(
   credentials: {
     service: 'vertex-ai-api',
     file_path: 'google-credentials.json',
-    project_id: 'PROJECT_ID',
     region: 'us-east4'
   },
   options: { model: 'gemini-pro', stream: false }
@@ -276,7 +280,6 @@ client = Gemini.new(
 client = Gemini.new(
   credentials: {
     service: 'vertex-ai-api',
-    project_id: 'PROJECT_ID',
     region: 'us-east4'
   },
   options: { model: 'gemini-pro', stream: false }
