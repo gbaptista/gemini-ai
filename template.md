@@ -86,6 +86,11 @@ gem 'gemini-ai', '~> 2.1.0'
 
 ### Credentials
 
+- [Option 1: API Key (Generative Language API)](#option-1-api-key-generative-language-api)
+- [Option 2: Service Account Credentials File (Vertex AI API)](#option-2-service-account-credentials-file-vertex-ai-api)
+- [Option 3: Application Default Credentials (Vertex AI API)](#option-3-application-default-credentials-vertex-ai-api)
+- [Required Data](#required-data)
+
 > ⚠️ DISCLAIMER: Be careful with what you are doing, and never trust others' code related to this. These commands and instructions alter the level of access to your Google Cloud Account, and running them naively can lead to security risks as well as financial risks. People with access to your account can use it to steal data or incur charges. Run these commands at your own responsibility and due diligence; expect no warranties from the contributors of this project.
 
 #### Option 1: API Key (Generative Language API)
