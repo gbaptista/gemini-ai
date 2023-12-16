@@ -12,12 +12,16 @@ module Gemini
         if config[:credentials][:api_key]
           @authentication = :api_key
           @api_key = config[:credentials][:api_key]
-        else
+        elsif config[:credentials][:file_path]
           @authentication = :service_account
           @authorizer = ::Google::Auth::ServiceAccountCredentials.make_creds(
             json_key_io: File.open(config[:credentials][:file_path]),
             scope: 'https://www.googleapis.com/auth/cloud-platform'
           )
+        else
+          @authentication = :default_credentials
+          scopes = ["https://www.googleapis.com/auth/cloud-platform"]
+          @authorizer = ::Google::Auth.get_application_default(scopes)
         end
 
         @address = case config[:credentials][:service]
@@ -55,7 +59,7 @@ module Gemini
         response = Faraday.new.post do |request|
           request.url url
           request.headers['Content-Type'] = 'application/json'
-          if @authentication == :service_account
+          if @authentication == :service_account || @authentication == :default_credentials
             request.headers['Authorization'] = "Bearer #{@authorizer.fetch_access_token!['access_token']}"
           end
 

@@ -35,6 +35,21 @@ client = Gemini.new(
   options: { model: 'gemini-pro', stream: false }
 )
 
+# With application default credentials
+# Note: ensure you have set on of
+# - GOOGLE_APPLICATION_CREDENTIALS environment variable
+# - User credentials set up by using the Google Cloud CLI
+# if running outside GCP.
+client = Gemini.new(
+  credentials: {
+    service: 'vertex-ai-api',
+    project_id: 'PROJECT_ID',
+    region: 'us-east4'
+  },
+  options: { model: 'gemini-pro', stream: false }
+)
+
+
 result = client.stream_generate_content({
   contents: { role: 'user', parts: { text: 'hi!' } }
 })
