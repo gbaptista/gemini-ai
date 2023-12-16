@@ -111,11 +111,7 @@ module Gemini
 
         results.map { |result| result[:event] }
       rescue Faraday::ServerError => e
-        raise RequestError.new(
-          e.message,
-          request: e,
-          payload:
-        )
+        raise RequestError.new(e.message, request: e, payload:)
       end
 
       def safe_parse_json(raw)
