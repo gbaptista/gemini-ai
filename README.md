@@ -1,6 +1,6 @@
 # Gemini AI
 
-A Ruby Gem for interacting with [Gemini](https://deepmind.google/technologies/gemini/) through [Vertex AI](https://cloud.google.com/vertex-ai) or [AI Studio](https://makersuite.google.com), Google's generative AI services.
+A Ruby Gem for interacting with [Gemini](https://deepmind.google/technologies/gemini/) through [Vertex AI](https://cloud.google.com/vertex-ai), [Generative Language API](https://ai.google.dev/api/rest), or [AI Studio](https://makersuite.google.com), Google's generative AI services.
 
 ![The logo shows a gemstone split into red and blue halves, symbolizing Ruby programming and Gemini AI. It's surrounded by a circuit-like design on a dark blue backdrop.](https://raw.githubusercontent.com/gbaptista/assets/main/gemini-ai/ruby-gemini-ai.png)
 
@@ -9,7 +9,7 @@ A Ruby Gem for interacting with [Gemini](https://deepmind.google/technologies/ge
 ## TL;DR and Quick Start
 
 ```ruby
-gem 'gemini-ai', '~> 2.0'
+gem 'gemini-ai', '~> 2.1.0'
 ```
 
 ```ruby
@@ -100,11 +100,11 @@ Result:
 ### Installing
 
 ```sh
-gem install gemini-ai -v 2.0.0
+gem install gemini-ai -v 2.1.0
 ```
 
 ```sh
-gem 'gemini-ai', '~> 2.0'
+gem 'gemini-ai', '~> 2.1.0'
 ```
 
 ### Credentials
@@ -614,7 +614,7 @@ gem build gemini-ai.gemspec
 
 gem signin
 
-gem push gemini-ai-2.0.0.gem
+gem push gemini-ai-2.1.0.gem
 ```
 
 ### Updating the README
