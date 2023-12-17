@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    gemini-ai (2.2.0)
+    gemini-ai (3.0.0)
       event_stream_parser (~> 1.0)
       faraday (~> 2.7, >= 2.7.12)
       googleauth (~> 1.9, >= 1.9.1)
