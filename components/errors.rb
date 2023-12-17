@@ -10,7 +10,7 @@ module Gemini
 
     class MissingProjectIdError < GeminiError; end
     class UnsupportedServiceError < GeminiError; end
-    class BlockWithoutStreamError < GeminiError; end
+    class BlockWithoutServerSentEventsError < GeminiError; end
 
     class RequestError < GeminiError
       attr_reader :request, :payload

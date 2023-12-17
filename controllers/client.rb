@@ -5,7 +5,7 @@ require 'faraday'
 require 'json'
 require 'googleauth'
 
-require_relative '../components/errors'
+require_relative '../ports/dsl/gemini-ai/errors'
 
 module Gemini
   module Controllers
@@ -26,43 +26,50 @@ module Gemini
         end
 
         if @authentication == :service_account || @authentication == :default_credentials
-          @project_id = if config[:credentials][:project_id].nil?
-                          @authorizer.project_id || @authorizer.quota_project_id
-                        else
-                          config[:credentials][:project_id]
-                        end
+          @project_id = config[:credentials][:project_id] || @authorizer.project_id || @authorizer.quota_project_id
 
           raise MissingProjectIdError, 'Could not determine project_id, which is required.' if @project_id.nil?
         end
 
-        @address = case config[:credentials][:service]
+        @service = config[:credentials][:service]
+
+        @address = case @service
                    when 'vertex-ai-api'
                      "https://#{config[:credentials][:region]}-aiplatform.googleapis.com/v1/projects/#{@project_id}/locations/#{config[:credentials][:region]}/publishers/google/models/#{config[:options][:model]}"
                    when 'generative-language-api'
                      "https://generativelanguage.googleapis.com/v1/models/#{config[:options][:model]}"
                    else
-                     raise UnsupportedServiceError, "Unsupported service: #{config[:credentials][:service]}"
+                     raise UnsupportedServiceError, "Unsupported service: #{@service}"
                    end
 
-        @stream = config[:options][:stream]
+        @server_sent_events = config[:options][:server_sent_events]
       end
 
-      def stream_generate_content(payload, stream: nil, &callback)
-        request('streamGenerateContent', payload, stream:, &callback)
+      def stream_generate_content(payload, server_sent_events: nil, &callback)
+        request('streamGenerateContent', payload, server_sent_events:, &callback)
       end
 
-      def request(path, payload, stream: nil, &callback)
-        stream_enabled = stream.nil? ? @stream : stream
+      def generate_content(payload, server_sent_events: nil, &callback)
+        result = request('generateContent', payload, server_sent_events:, &callback)
+
+        return result.first if result.is_a?(Array) && result.size == 1
+
+        result
+      end
+
+      def request(path, payload, server_sent_events: nil, &callback)
+        server_sent_events_enabled = server_sent_events.nil? ? @server_sent_events : server_sent_events
         url = "#{@address}:#{path}"
         params = []
 
-        params << 'alt=sse' if stream_enabled
+        params << 'alt=sse' if server_sent_events_enabled
         params << "key=#{@api_key}" if @authentication == :api_key
 
         url += "?#{params.join('&')}" if params.size.positive?
 
-        if !callback.nil? && !stream_enabled
-          raise BlockWithoutStreamError, 'You are trying to use a block without stream enabled.'
+        if !callback.nil? && !server_sent_events_enabled
+          raise BlockWithoutServerSentEventsError,
+                'You are trying to use a block without Server Sent Events (SSE) enabled.'
         end
 
         results = []
@@ -78,7 +85,7 @@ module Gemini
 
           request.body = payload.to_json
 
-          if stream_enabled
+          if server_sent_events_enabled
             parser = EventStreamParser::Parser.new
 
             request.options.on_data = proc do |chunk, bytes, env|
@@ -107,7 +114,7 @@ module Gemini
           end
         end
 
-        return safe_parse_json(response.body) unless stream_enabled
+        return safe_parse_json(response.body) unless server_sent_events_enabled
 
         results.map { |result| result[:event] }
       rescue Faraday::ServerError => e

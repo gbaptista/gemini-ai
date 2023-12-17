@@ -4,7 +4,7 @@
   (-> text
       (clojure.string/lower-case)
       (clojure.string/replace " " "-")
-      (clojure.string/replace #"[^a-z0-9\-]" "")))
+      (clojure.string/replace #"[^a-z0-9\-_]" "")))
 
 (defn remove-code-blocks [content]
   (let [code-block-regex #"(?s)```.*?```"]
