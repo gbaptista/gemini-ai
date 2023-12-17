@@ -21,7 +21,7 @@ client = Gemini.new(
     service: 'generative-language-api',
     api_key: ENV['GOOGLE_API_KEY']
   },
-  options: { model: 'gemini-pro', stream: false }
+  options: { model: 'gemini-pro', server_sent_events: true }
 )
 
 # With a Service Account Credentials File
@@ -31,7 +31,7 @@ client = Gemini.new(
     file_path: 'google-credentials.json',
     region: 'us-east4'
   },
-  options: { model: 'gemini-pro', stream: false }
+  options: { model: 'gemini-pro', server_sent_events: true }
 )
 
 # With Application Default Credentials
@@ -40,7 +40,7 @@ client = Gemini.new(
     service: 'vertex-ai-api',
     region: 'us-east4'
   },
-  options: { model: 'gemini-pro', stream: false }
+  options: { model: 'gemini-pro', server_sent_events: true }
 )
 
 result = client.stream_generate_content({
@@ -81,16 +81,20 @@ Result:
         - [Required Data](#required-data)
 - [Usage](#usage)
     - [Client](#client)
-    - [Generate Content](#generate-content)
-        - [Modes](#modes)
-            - [Text](#text)
-            - [Image](#image)
-            - [Video](#video)
-        - [Synchronous](#synchronous)
-        - [Streaming](#streaming)
-        - [Streaming Hang](#streaming-hang)
-        - [Back-and-Forth Conversations](#back-and-forth-conversations)
-        - [Tools (Functions) Calling](#tools-functions-calling)
+    - [Methods](#methods)
+        - [stream_generate_content](#stream_generate_content)
+            - [Receiving Stream Events](#receiving-stream-events)
+            - [Without Events](#without-events)
+        - [generate_content](#generate_content)
+    - [Modes](#modes)
+        - [Text](#text)
+        - [Image](#image)
+        - [Video](#video)
+    - [Streaming vs. Server-Sent Events (SSE)](#streaming-vs-server-sent-events-sse)
+        - [Server-Sent Events (SSE) Hang](#server-sent-events-sse-hang)
+        - [Non-Streaming](#non-streaming)
+    - [Back-and-Forth Conversations](#back-and-forth-conversations)
+    - [Tools (Functions) Calling](#tools-functions-calling)
     - [New Functionalities and APIs](#new-functionalities-and-apis)
     - [Error Handling](#error-handling)
         - [Rescuing](#rescuing)
@@ -279,7 +283,7 @@ client = Gemini.new(
     service: 'generative-language-api',
     api_key: ENV['GOOGLE_API_KEY']
   },
-  options: { model: 'gemini-pro', stream: false }
+  options: { model: 'gemini-pro', server_sent_events: true }
 )
 
 # With a Service Account Credentials File
@@ -289,7 +293,7 @@ client = Gemini.new(
     file_path: 'google-credentials.json',
     region: 'us-east4'
   },
-  options: { model: 'gemini-pro', stream: false }
+  options: { model: 'gemini-pro', server_sent_events: true }
 )
 
 # With Application Default Credentials
@@ -298,15 +302,118 @@ client = Gemini.new(
     service: 'vertex-ai-api',
     region: 'us-east4'
   },
-  options: { model: 'gemini-pro', stream: false }
+  options: { model: 'gemini-pro', server_sent_events: true }
 )
 ```
 
-### Generate Content
+### Methods
 
-#### Modes
+#### stream_generate_content
 
-##### Text
+##### Receiving Stream Events
+
+Ensure that you have enabled [Server-Sent Events](#streaming-vs-server-sent-events-sse) before using blocks for streaming:
+
+```ruby
+client.stream_generate_content(
+  { contents: { role: 'user', parts: { text: 'hi!' } } }
+) do |event, parsed, raw|
+  puts event
+end
+```
+
+Event:
+```ruby
+{ 'candidates' =>
+  [{ 'content' => {
+       'role' => 'model',
+       'parts' => [{ 'text' => 'Hello! How may I assist you?' }]
+     },
+     'finishReason' => 'STOP',
+     'safetyRatings' =>
+     [{ 'category' => 'HARM_CATEGORY_HARASSMENT', 'probability' => 'NEGLIGIBLE' },
+      { 'category' => 'HARM_CATEGORY_HATE_SPEECH', 'probability' => 'NEGLIGIBLE' },
+      { 'category' => 'HARM_CATEGORY_SEXUALLY_EXPLICIT', 'probability' => 'NEGLIGIBLE' },
+      { 'category' => 'HARM_CATEGORY_DANGEROUS_CONTENT', 'probability' => 'NEGLIGIBLE' }] }],
+  'usageMetadata' => {
+    'promptTokenCount' => 2,
+    'candidatesTokenCount' => 8,
+    'totalTokenCount' => 10
+  } }
+```
+
+##### Without Events
+
+You can use `stream_generate_content` without events:
+
+```ruby
+result = client.stream_generate_content(
+  { contents: { role: 'user', parts: { text: 'hi!' } } }
+)
+```
+
+In this case, the result will be an array with all the received events:
+
+```ruby
+[{ 'candidates' =>
+   [{ 'content' => {
+        'role' => 'model',
+        'parts' => [{ 'text' => 'Hello! How may I assist you?' }]
+      },
+      'finishReason' => 'STOP',
+      'safetyRatings' =>
+      [{ 'category' => 'HARM_CATEGORY_HARASSMENT', 'probability' => 'NEGLIGIBLE' },
+       { 'category' => 'HARM_CATEGORY_HATE_SPEECH', 'probability' => 'NEGLIGIBLE' },
+       { 'category' => 'HARM_CATEGORY_SEXUALLY_EXPLICIT', 'probability' => 'NEGLIGIBLE' },
+       { 'category' => 'HARM_CATEGORY_DANGEROUS_CONTENT', 'probability' => 'NEGLIGIBLE' }] }],
+   'usageMetadata' => {
+     'promptTokenCount' => 2,
+     'candidatesTokenCount' => 8,
+     'totalTokenCount' => 10
+   } }]
+```
+
+You can mix both as well:
+```ruby
+result = client.stream_generate_content(
+  { contents: { role: 'user', parts: { text: 'hi!' } } }
+) do |event, parsed, raw|
+  puts event
+end
+```
+
+#### generate_content
+
+```ruby
+result = client.generate_content(
+  { contents: { role: 'user', parts: { text: 'hi!' } } }
+)
+```
+
+Result:
+```ruby
+{ 'candidates' =>
+  [{ 'content' => { 'parts' => [{ 'text' => 'Hello! How can I assist you today?' }], 'role' => 'model' },
+     'finishReason' => 'STOP',
+     'index' => 0,
+     'safetyRatings' =>
+     [{ 'category' => 'HARM_CATEGORY_SEXUALLY_EXPLICIT', 'probability' => 'NEGLIGIBLE' },
+      { 'category' => 'HARM_CATEGORY_HATE_SPEECH', 'probability' => 'NEGLIGIBLE' },
+      { 'category' => 'HARM_CATEGORY_HARASSMENT', 'probability' => 'NEGLIGIBLE' },
+      { 'category' => 'HARM_CATEGORY_DANGEROUS_CONTENT', 'probability' => 'NEGLIGIBLE' }] }],
+  'promptFeedback' =>
+  { 'safetyRatings' =>
+    [{ 'category' => 'HARM_CATEGORY_SEXUALLY_EXPLICIT', 'probability' => 'NEGLIGIBLE' },
+     { 'category' => 'HARM_CATEGORY_HATE_SPEECH', 'probability' => 'NEGLIGIBLE' },
+     { 'category' => 'HARM_CATEGORY_HARASSMENT', 'probability' => 'NEGLIGIBLE' },
+     { 'category' => 'HARM_CATEGORY_DANGEROUS_CONTENT', 'probability' => 'NEGLIGIBLE' }] } }
+```
+
+As of the writing of this README, only the `generative-language-api` service supports the `generate_content` method; `vertex-ai-api` does not.
+
+### Modes
+
+#### Text
 
 ```ruby
 result = client.stream_generate_content({
@@ -334,7 +441,7 @@ Result:
    } }]
 ```
 
-##### Image
+#### Image
 
 ![A black and white image of an old piano. The piano is an upright model, with the keys on the right side of the image. The piano is sitting on a tiled floor. There is a small round object on the top of the piano.](https://raw.githubusercontent.com/gbaptista/assets/main/gemini-ai/piano.jpg)
 
@@ -345,7 +452,7 @@ Switch to the `gemini-pro-vision` model:
 ```ruby
 client = Gemini.new(
   credentials: { service: 'vertex-ai-api', region: 'us-east4' },
-  options: { model: 'gemini-pro-vision', stream: true }
+  options: { model: 'gemini-pro-vision', server_sent_events: true }
 )
 ```
 
@@ -391,7 +498,7 @@ The result:
    'usageMetadata' => { 'promptTokenCount' => 263, 'candidatesTokenCount' => 50, 'totalTokenCount' => 313 } }]
 ```
 
-##### Video
+#### Video
 
 https://gist.github.com/assets/29520/f82bccbf-02d2-4899-9c48-eb8a0a5ef741
 
@@ -404,7 +511,7 @@ Switch to the `gemini-pro-vision` model:
 ```ruby
 client = Gemini.new(
   credentials: { service: 'vertex-ai-api', region: 'us-east4' },
-  options: { model: 'gemini-pro-vision', stream: true }
+  options: { model: 'gemini-pro-vision', server_sent_events: true }
 )
 ```
 
@@ -451,41 +558,15 @@ The result:
   "usageMetadata"=>{"promptTokenCount"=>1037, "candidatesTokenCount"=>32, "totalTokenCount"=>1069}}]
 ```
 
-#### Synchronous
+### Streaming vs. Server-Sent Events (SSE)
 
-```ruby
-result = client.stream_generate_content({
-  contents: { role: 'user', parts: { text: 'hi!' } }
-})
-```
+[Server-Sent Events (SSE)](https://en.wikipedia.org/wiki/Server-sent_events) is a technology that allows certain endpoints to offer streaming capabilities, such as creating the impression that "the model is typing along with you," rather than delivering the entire answer all at once.
 
-Result:
-```ruby
-[{ 'candidates' =>
-   [{ 'content' => {
-        'role' => 'model',
-        'parts' => [{ 'text' => 'Hello! How may I assist you?' }]
-      },
-      'finishReason' => 'STOP',
-      'safetyRatings' =>
-      [{ 'category' => 'HARM_CATEGORY_HARASSMENT', 'probability' => 'NEGLIGIBLE' },
-       { 'category' => 'HARM_CATEGORY_HATE_SPEECH', 'probability' => 'NEGLIGIBLE' },
-       { 'category' => 'HARM_CATEGORY_SEXUALLY_EXPLICIT', 'probability' => 'NEGLIGIBLE' },
-       { 'category' => 'HARM_CATEGORY_DANGEROUS_CONTENT', 'probability' => 'NEGLIGIBLE' }] }],
-   'usageMetadata' => {
-     'promptTokenCount' => 2,
-     'candidatesTokenCount' => 8,
-     'totalTokenCount' => 10
-   } }]
-```
-
-#### Streaming
-
-You can set up the client to use streaming for all supported endpoints:
+You can set up the client to use Server-Sent Events (SSE) for all supported endpoints:
 ```ruby
 client = Gemini.new(
   credentials: { ... },
-  options: { model: 'gemini-pro', stream: true }
+  options: { model: 'gemini-pro', server_sent_events: true }
 )
 ```
 
@@ -493,11 +574,11 @@ Or, you can decide on a request basis:
 ```ruby
 client.stream_generate_content(
   { contents: { role: 'user', parts: { text: 'hi!' } } },
-  stream: true
+  server_sent_events: true
 )
 ```
 
-With streaming enabled, you can use a block to receive the results:
+With Server-Sent Events (SSE) enabled, you can use a block to receive partial results via events. This feature is particularly useful for methods that offer streaming capabilities, such as `stream_generate_content`:
 
 ```ruby
 client.stream_generate_content(
@@ -527,14 +608,16 @@ Event:
   } }
 ```
 
-#### Streaming Hang
+Even though streaming methods utilize Server-Sent Events (SSE), using this feature doesn't necessarily mean streaming data. For example, when `generate_content` is called with SSE enabled, you will receive all the data at once in a single event, rather than through multiple partial events. This occurs because `generate_content` isn't designed for streaming, even though it is capable of utilizing Server-Sent Events.
 
-Method calls will _hang_ until the stream finishes, so even without providing a block, you can get the final results of the stream events:
+#### Server-Sent Events (SSE) Hang
+
+Method calls will _hang_ until the server-sent events finish, so even without providing a block, you can obtain the final results of the received events:
 
 ```ruby
 result = client.stream_generate_content(
   { contents: { role: 'user', parts: { text: 'hi!' } } },
-  stream: true
+  server_sent_events: true
 )
 ```
 
@@ -558,7 +641,40 @@ Result:
    } }]
 ```
 
-#### Back-and-Forth Conversations
+#### Non-Streaming
+
+Depending on the service, you can use the [`generate_content`](#generate_content) method, which does not stream the answer.
+
+You can also use methods designed for streaming without necessarily processing partial events; instead, you can wait for the result of all received events:
+
+```ruby
+result = client.stream_generate_content({
+  contents: { role: 'user', parts: { text: 'hi!' } },
+  server_sent_events: false
+})
+```
+
+Result:
+```ruby
+[{ 'candidates' =>
+   [{ 'content' => {
+        'role' => 'model',
+        'parts' => [{ 'text' => 'Hello! How may I assist you?' }]
+      },
+      'finishReason' => 'STOP',
+      'safetyRatings' =>
+      [{ 'category' => 'HARM_CATEGORY_HARASSMENT', 'probability' => 'NEGLIGIBLE' },
+       { 'category' => 'HARM_CATEGORY_HATE_SPEECH', 'probability' => 'NEGLIGIBLE' },
+       { 'category' => 'HARM_CATEGORY_SEXUALLY_EXPLICIT', 'probability' => 'NEGLIGIBLE' },
+       { 'category' => 'HARM_CATEGORY_DANGEROUS_CONTENT', 'probability' => 'NEGLIGIBLE' }] }],
+   'usageMetadata' => {
+     'promptTokenCount' => 2,
+     'candidatesTokenCount' => 8,
+     'totalTokenCount' => 10
+   } }]
+```
+
+### Back-and-Forth Conversations
 
 To maintain a back-and-forth conversation, you need to append the received responses and build a history for your requests:
 
@@ -600,7 +716,7 @@ Result:
    } }]
 ```
 
-#### Tools (Functions) Calling
+### Tools (Functions) Calling
 
 > As of the writing of this README, only the `vertex-ai-api` service and the `gemini-pro` model [supports](https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/function-calling#supported_models) tools (functions) calls.
 
@@ -803,7 +919,7 @@ GeminiError
 
 MissingProjectIdError
 UnsupportedServiceError
-BlockWithoutStreamError
+BlockWithoutServerSentEventsError
 
 RequestError
 ```
