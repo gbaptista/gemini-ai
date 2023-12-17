@@ -608,7 +608,9 @@ Result:
 
 #### Non-Streaming
 
-You can use methods designed for streaming, without necessarily receiving partial events, and instead wait for the result of all the received events:
+Depending on the service, you can use the [`generate_content`](#generate_content) method, which does not stream the answer.
+
+You can also use methods designed for streaming without necessarily processing partial events; instead, you can wait for the result of all received events:
 
 ```ruby
 result = client.stream_generate_content({
