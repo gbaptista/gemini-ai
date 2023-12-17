@@ -275,9 +275,9 @@ client = Gemini.new(
 
 #### stream_generate_content
 
-##### Receiving Events
+##### Receiving Stream Events
 
-Ensure that you have enabled [Server-Sent Events](#streaming-vs-server-sent-events-sse) before using blocks for streaming.
+Ensure that you have enabled [Server-Sent Events](#streaming-vs-server-sent-events-sse) before using blocks for streaming:
 
 ```ruby
 client.stream_generate_content(
@@ -309,7 +309,7 @@ Event:
 
 ##### Without Events
 
-You can use `stream_generate_content` without events as well:
+You can use `stream_generate_content` without events:
 
 ```ruby
 result = client.stream_generate_content(
@@ -338,12 +338,20 @@ In this case, the result will be an array with all the received events:
    } }]
 ```
 
+You can mix both as well:
+```ruby
+result = client.stream_generate_content(
+  { contents: { role: 'user', parts: { text: 'hi!' } } }
+) do |event, parsed, raw|
+  puts event
+end
+```
+
 #### generate_content
 
 ```ruby
 result = client.generate_content(
-  { contents: { role: 'user', parts: { text: 'hi!' } } },
-  server_sent_events: false
+  { contents: { role: 'user', parts: { text: 'hi!' } } }
 )
 ```
 
@@ -517,7 +525,7 @@ The result:
 
 ### Streaming vs. Server-Sent Events (SSE)
 
-[Server-Sent Events (SSE)](https://en.wikipedia.org/wiki/Server-sent_events) is a technology that allows certain endpoints to offer streaming capabilities, such as creating the impression that "the model is typing along with you," rather than delivering the entire content all at once.
+[Server-Sent Events (SSE)](https://en.wikipedia.org/wiki/Server-sent_events) is a technology that allows certain endpoints to offer streaming capabilities, such as creating the impression that "the model is typing along with you," rather than delivering the entire answer all at once.
 
 You can set up the client to use Server-Sent Events (SSE) for all supported endpoints:
 ```ruby
@@ -565,9 +573,9 @@ Event:
   } }
 ```
 
-Even though streaming methods utilize Server-Sent Events (SSE), using this feature doesn't necessarily mean streaming data. For example, when `generate_content` is called with SSE enabled, you will receive all the data at once in a single event, rather than through multiple partial events. This occurs because `generate_content` isn't specifically designed for streaming, even though it is capable of utilizing Server-Sent Events.
+Even though streaming methods utilize Server-Sent Events (SSE), using this feature doesn't necessarily mean streaming data. For example, when `generate_content` is called with SSE enabled, you will receive all the data at once in a single event, rather than through multiple partial events. This occurs because `generate_content` isn't designed for streaming, even though it is capable of utilizing Server-Sent Events.
 
-### Server-Sent Events (SSE) Hang
+#### Server-Sent Events (SSE) Hang
 
 Method calls will _hang_ until the server-sent events finish, so even without providing a block, you can obtain the final results of the received events:
 
@@ -598,11 +606,14 @@ Result:
    } }]
 ```
 
-### Non-Streaming
+#### Non-Streaming
+
+You can use methods designed for streaming, without necessarily receiving partial events, and instead wait for the result of all the received events:
 
 ```ruby
 result = client.stream_generate_content({
-  contents: { role: 'user', parts: { text: 'hi!' } }
+  contents: { role: 'user', parts: { text: 'hi!' } },
+  server_sent_events: false
 })
 ```
 
