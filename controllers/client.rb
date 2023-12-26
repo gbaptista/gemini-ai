@@ -43,6 +43,7 @@ module Gemini
                    end
 
         @server_sent_events = config[:options][:server_sent_events]
+        @timeout = config[:options][:timeout]
       end
 
       def stream_generate_content(payload, server_sent_events: nil, &callback)
@@ -76,6 +77,7 @@ module Gemini
 
         response = Faraday.new do |faraday|
           faraday.response :raise_error
+          faraday.options.timeout = @timeout if @timeout
         end.post do |request|
           request.url url
           request.headers['Content-Type'] = 'application/json'
