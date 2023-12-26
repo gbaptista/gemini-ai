@@ -1,9 +1,9 @@
 PATH
   remote: .
   specs:
-    gemini-ai (3.0.0)
+    gemini-ai (3.1.0)
       event_stream_parser (~> 1.0)
-      faraday (~> 2.7, >= 2.7.12)
+      faraday (~> 2.8, >= 2.8.1)
       googleauth (~> 1.9, >= 1.9.1)
 
 GEM
@@ -16,7 +16,7 @@ GEM
     byebug (11.1.3)
     coderay (1.1.3)
     event_stream_parser (1.0.0)
-    faraday (2.7.12)
+    faraday (2.8.1)
       base64
       faraday-net_http (>= 2.0, < 3.1)
       ruby2_keywords (>= 0.0.4)
