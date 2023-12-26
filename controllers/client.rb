@@ -10,6 +10,8 @@ require_relative '../ports/dsl/gemini-ai/errors'
 module Gemini
   module Controllers
     class Client
+      ALLOWED_REQUEST_OPTIONS = %i[timeout open_timeout read_timeout write_timeout].freeze
+
       def initialize(config)
         if config[:credentials][:api_key]
           @authentication = :api_key
@@ -43,7 +45,16 @@ module Gemini
                    end
 
         @server_sent_events = config[:options][:server_sent_events]
-        @timeout = config[:options][:timeout]
+
+        @request_options = config.dig(:options, :connection, :request)
+
+        @request_options = if @request_options.is_a?(Hash)
+                             @request_options.select do |key, _|
+                               ALLOWED_REQUEST_OPTIONS.include?(key)
+                             end
+                           else
+                             {}
+                           end
       end
 
       def stream_generate_content(payload, server_sent_events: nil, &callback)
@@ -75,7 +86,7 @@ module Gemini
 
         results = []
 
-        response = Faraday.new do |faraday|
+        response = Faraday.new(request: @request_options) do |faraday|
           faraday.response :raise_error
           faraday.options.timeout = @timeout if @timeout
         end.post do |request|
