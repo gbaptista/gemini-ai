@@ -88,7 +88,6 @@ module Gemini
 
         response = Faraday.new(request: @request_options) do |faraday|
           faraday.response :raise_error
-          faraday.options.timeout = @timeout if @timeout
         end.post do |request|
           request.url url
           request.headers['Content-Type'] = 'application/json'
