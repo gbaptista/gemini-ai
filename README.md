@@ -96,6 +96,8 @@ Result:
     - [Back-and-Forth Conversations](#back-and-forth-conversations)
     - [Tools (Functions) Calling](#tools-functions-calling)
     - [New Functionalities and APIs](#new-functionalities-and-apis)
+    - [Request Options](#request-options)
+        - [Timeout](#timeout)
     - [Error Handling](#error-handling)
         - [Rescuing](#rescuing)
         - [For Short](#for-short)
@@ -871,6 +873,42 @@ result = client.request(
   { contents: { role: 'user', parts: { text: 'hi!' } } }
 )
 ```
+
+### Request Options
+
+#### Timeout
+
+You can set the maximum number of seconds to wait for the request to complete with the `timeout` option:
+
+```ruby
+client = Gemini.new(
+  credentials: { service: 'vertex-ai-api', region: 'us-east4' },
+  options: {
+    model: 'gemini-pro',
+    connection: { request: { timeout: 5 } }
+  }
+)
+```
+
+You can also have more fine-grained control over [Faraday's Request Options](https://lostisland.github.io/faraday/#/customization/request-options?id=request-options) if you prefer:
+
+```ruby
+client = Gemini.new(
+  credentials: { service: 'vertex-ai-api', region: 'us-east4' },
+  options: {
+    model: 'gemini-pro',
+    connection: {
+      request: {
+        timeout: 5,
+        open_timeout: 5,
+        read_timeout: 5,
+        write_timeout: 5
+      }
+    }
+  }
+)
+```
+
 
 ### Error Handling
 
