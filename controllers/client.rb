@@ -44,7 +44,7 @@ module Gemini
                      raise UnsupportedServiceError, "Unsupported service: #{@service}"
                    end
 
-        @server_sent_events = config[:options][:server_sent_events]
+        @server_sent_events = config.dig(:options, :server_sent_events)
 
         @request_options = config.dig(:options, :connection, :request)
 
