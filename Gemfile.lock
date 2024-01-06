@@ -37,7 +37,7 @@ GEM
     multi_json (1.15.0)
     os (1.1.4)
     parallel (1.24.0)
-    parser (3.2.2.4)
+    parser (3.3.0.0)
       ast (~> 2.4.1)
       racc
     pry (0.14.2)
