@@ -118,8 +118,10 @@ module Gemini
 
                 results << result
 
-                parsed_data['candidates'].find do |candidate|
-                  !candidate['finishReason'].nil? && candidate['finishReason'] != ''
+                if parsed_data['candidates']
+                  parsed_data['candidates'].find do |candidate|
+                    !candidate['finishReason'].nil? && candidate['finishReason'] != ''
+                  end
                 end
               end
             end
