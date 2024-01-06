@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'event_stream_parser', '~> 1.0'
   spec.add_dependency 'faraday', '~> 2.8', '>= 2.8.1'
-  spec.add_dependency 'googleauth', '>= 1.8', '< 3'
+  spec.add_dependency 'googleauth', '~> 1.8'
 
   spec.metadata['rubygems_mfa_required'] = 'true'
 end
