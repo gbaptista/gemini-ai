@@ -5,7 +5,7 @@ require 'faraday'
 require 'json'
 require 'googleauth'
 
-require_relative '../ports/dsl/gemini-ai/errors'
+require_relative '../components/errors'
 
 module Gemini
   module Controllers
@@ -30,7 +30,7 @@ module Gemini
         if @authentication == :service_account || @authentication == :default_credentials
           @project_id = config[:credentials][:project_id] || @authorizer.project_id || @authorizer.quota_project_id
 
-          raise MissingProjectIdError, 'Could not determine project_id, which is required.' if @project_id.nil?
+          raise Errors::MissingProjectIdError, 'Could not determine project_id, which is required.' if @project_id.nil?
         end
 
         @service = config[:credentials][:service]
@@ -41,7 +41,7 @@ module Gemini
                    when 'generative-language-api'
                      "https://generativelanguage.googleapis.com/v1/models/#{config[:options][:model]}"
                    else
-                     raise UnsupportedServiceError, "Unsupported service: #{@service}"
+                     raise Errors::UnsupportedServiceError, "Unsupported service: #{@service}"
                    end
 
         @server_sent_events = config.dig(:options, :server_sent_events)
@@ -80,7 +80,7 @@ module Gemini
         url += "?#{params.join('&')}" if params.size.positive?
 
         if !callback.nil? && !server_sent_events_enabled
-          raise BlockWithoutServerSentEventsError,
+          raise Errors::BlockWithoutServerSentEventsError,
                 'You are trying to use a block without Server Sent Events (SSE) enabled.'
         end
 
@@ -132,7 +132,7 @@ module Gemini
 
         results.map { |result| result[:event] }
       rescue Faraday::ServerError => e
-        raise RequestError.new(e.message, request: e, payload:)
+        raise Errors::RequestError.new(e.message, request: e, payload:)
       end
 
       def safe_parse_json(raw)

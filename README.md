@@ -967,6 +967,8 @@ RequestError
 ```bash
 bundle
 rubocop -A
+
+bundle exec ruby spec/tasks/run-client.rb
 ```
 
 ### Purpose
