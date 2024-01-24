@@ -2,6 +2,7 @@
 
 require 'event_stream_parser'
 require 'faraday'
+require 'faraday/typhoeus'
 require 'json'
 require 'googleauth'
 
@@ -12,7 +13,24 @@ module Gemini
     class Client
       ALLOWED_REQUEST_OPTIONS = %i[timeout open_timeout read_timeout write_timeout].freeze
 
+      DEFAULT_FARADAY_ADAPTER = :typhoeus
+
+      DEFAULT_SERVICE_VERSION = 'v1'
+
       def initialize(config)
+        @service = config[:credentials][:service]
+
+        @service_version = config.dig(:credentials, :version) || DEFAULT_SERVICE_VERSION
+
+        @address = case @service
+                   when 'vertex-ai-api'
+                     "https://#{config[:credentials][:region]}-aiplatform.googleapis.com/#{@service_version}/projects/#{@project_id}/locations/#{config[:credentials][:region]}/publishers/google/models/#{config[:options][:model]}"
+                   when 'generative-language-api'
+                     "https://generativelanguage.googleapis.com/#{@service_version}/models/#{config[:options][:model]}"
+                   else
+                     raise Errors::UnsupportedServiceError, "Unsupported service: #{@service}"
+                   end
+
         if config[:credentials][:api_key]
           @authentication = :api_key
           @api_key = config[:credentials][:api_key]
@@ -33,20 +51,11 @@ module Gemini
           raise Errors::MissingProjectIdError, 'Could not determine project_id, which is required.' if @project_id.nil?
         end
 
-        @service = config[:credentials][:service]
-
-        @address = case @service
-                   when 'vertex-ai-api'
-                     "https://#{config[:credentials][:region]}-aiplatform.googleapis.com/v1/projects/#{@project_id}/locations/#{config[:credentials][:region]}/publishers/google/models/#{config[:options][:model]}"
-                   when 'generative-language-api'
-                     "https://generativelanguage.googleapis.com/v1/models/#{config[:options][:model]}"
-                   else
-                     raise Errors::UnsupportedServiceError, "Unsupported service: #{@service}"
-                   end
-
         @server_sent_events = config.dig(:options, :server_sent_events)
 
         @request_options = config.dig(:options, :connection, :request)
+
+        @faraday_adapter = config.dig(:options, :connection, :adapter) || DEFAULT_FARADAY_ADAPTER
 
         @request_options = if @request_options.is_a?(Hash)
                              @request_options.select do |key, _|
@@ -87,6 +96,7 @@ module Gemini
         results = []
 
         response = Faraday.new(request: @request_options) do |faraday|
+          faraday.adapter @faraday_adapter
           faraday.response :raise_error
         end.post do |request|
           request.url url
@@ -98,6 +108,9 @@ module Gemini
           request.body = payload.to_json
 
           if server_sent_events_enabled
+
+            partial_json = ''
+
             parser = EventStreamParser::Parser.new
 
             request.options.on_data = proc do |chunk, bytes, env|
@@ -107,20 +120,27 @@ module Gemini
               end
 
               parser.feed(chunk) do |type, data, id, reconnection_time|
-                parsed_data = safe_parse_json(data)
-                result = {
-                  event: safe_parse_json(data),
-                  parsed: { type:, data:, id:, reconnection_time: },
-                  raw: { chunk:, bytes:, env: }
-                }
+                partial_json += data
 
-                callback.call(result[:event], result[:parsed], result[:raw]) unless callback.nil?
+                parsed_json = safe_parse_json(partial_json)
 
-                results << result
+                if parsed_json
+                  result = {
+                    event: parsed_json,
+                    parsed: { type:, data:, id:, reconnection_time: },
+                    raw: { chunk:, bytes:, env: }
+                  }
 
-                if parsed_data['candidates']
-                  parsed_data['candidates'].find do |candidate|
-                    !candidate['finishReason'].nil? && candidate['finishReason'] != ''
+                  callback.call(result[:event], result[:parsed], result[:raw]) unless callback.nil?
+
+                  results << result
+
+                  partial_json = ''
+
+                  if parsed_json['candidates']
+                    parsed_json['candidates'].find do |candidate|
+                      !candidate['finishReason'].nil? && candidate['finishReason'] != ''
+                    end
                   end
                 end
               end
@@ -136,9 +156,9 @@ module Gemini
       end
 
       def safe_parse_json(raw)
-        raw.start_with?('{', '[') ? JSON.parse(raw) : raw
+        raw.to_s.lstrip.start_with?('{', '[') ? JSON.parse(raw) : nil
       rescue JSON::ParserError
-        raw
+        nil
       end
     end
   end
