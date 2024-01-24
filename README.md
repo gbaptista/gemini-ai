@@ -79,6 +79,7 @@ Result:
         - [Option 2: Service Account Credentials File (Vertex AI API)](#option-2-service-account-credentials-file-vertex-ai-api)
         - [Option 3: Application Default Credentials (Vertex AI API)](#option-3-application-default-credentials-vertex-ai-api)
         - [Required Data](#required-data)
+    - [Custom Version](#custom-version)
 - [Usage](#usage)
     - [Client](#client)
     - [Methods](#methods)
@@ -97,6 +98,7 @@ Result:
     - [Tools (Functions) Calling](#tools-functions-calling)
     - [New Functionalities and APIs](#new-functionalities-and-apis)
     - [Request Options](#request-options)
+        - [Adapter](#adapter)
         - [Timeout](#timeout)
     - [Error Handling](#error-handling)
         - [Rescuing](#rescuing)
@@ -268,6 +270,43 @@ You might want to explicitly set a Google Cloud Project ID, which you can do as 
   service: 'vertex-ai-api',
   project_id: 'PROJECT_ID'
 }
+```
+
+### Custom Version
+
+By default, the gem uses the `v1` version of the APIs. You may want to use a different version:
+
+```ruby
+# With an API key
+client = Gemini.new(
+  credentials: {
+    service: 'generative-language-api',
+    api_key: ENV['GOOGLE_API_KEY'],
+    version: 'v1beta'
+  },
+  options: { model: 'gemini-pro', server_sent_events: true }
+)
+
+# With a Service Account Credentials File
+client = Gemini.new(
+  credentials: {
+    service: 'vertex-ai-api',
+    file_path: 'google-credentials.json',
+    region: 'us-east4',
+    version: 'v1beta'
+  },
+  options: { model: 'gemini-pro', server_sent_events: true }
+)
+
+# With Application Default Credentials
+client = Gemini.new(
+  credentials: {
+    service: 'vertex-ai-api',
+    region: 'us-east4',
+    version: 'v1beta'
+  },
+  options: { model: 'gemini-pro', server_sent_events: true }
+)
 ```
 
 ## Usage
@@ -875,6 +914,24 @@ result = client.request(
 ```
 
 ### Request Options
+
+#### Adapter
+
+To enable streaming, the gem uses [Faraday](https://github.com/lostisland/faraday) with the [Typhoeus](https://github.com/typhoeus/typhoeus) adapter by default.
+
+You can use a different adapter if you want:
+
+```ruby
+require 'faraday/net_http'
+
+client = Gemini.new(
+  credentials: { service: 'vertex-ai-api', region: 'us-east4' },
+  options: {
+    model: 'gemini-pro',
+    connection: { adapter: :net_http }
+  }
+)
+```
 
 #### Timeout
 
