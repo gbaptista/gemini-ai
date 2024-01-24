@@ -20,16 +20,9 @@ module Gemini
       def initialize(config)
         @service = config[:credentials][:service]
 
-        @service_version = config.dig(:credentials, :version) || DEFAULT_SERVICE_VERSION
-
-        @address = case @service
-                   when 'vertex-ai-api'
-                     "https://#{config[:credentials][:region]}-aiplatform.googleapis.com/#{@service_version}/projects/#{@project_id}/locations/#{config[:credentials][:region]}/publishers/google/models/#{config[:options][:model]}"
-                   when 'generative-language-api'
-                     "https://generativelanguage.googleapis.com/#{@service_version}/models/#{config[:options][:model]}"
-                   else
-                     raise Errors::UnsupportedServiceError, "Unsupported service: #{@service}"
-                   end
+        unless %w[vertex-ai-api generative-language-api].include?(@service)
+          raise Errors::UnsupportedServiceError, "Unsupported service: #{@service}"
+        end
 
         if config[:credentials][:api_key]
           @authentication = :api_key
@@ -50,6 +43,15 @@ module Gemini
 
           raise Errors::MissingProjectIdError, 'Could not determine project_id, which is required.' if @project_id.nil?
         end
+
+        @service_version = config.dig(:credentials, :version) || DEFAULT_SERVICE_VERSION
+
+        @address = case @service
+                   when 'vertex-ai-api'
+                     "https://#{config[:credentials][:region]}-aiplatform.googleapis.com/#{@service_version}/projects/#{@project_id}/locations/#{config[:credentials][:region]}/publishers/google/models/#{config[:options][:model]}"
+                   when 'generative-language-api'
+                     "https://generativelanguage.googleapis.com/#{@service_version}/models/#{config[:options][:model]}"
+                   end
 
         @server_sent_events = config.dig(:options, :server_sent_events)
 
