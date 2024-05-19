@@ -73,41 +73,46 @@ Result:
 - [TL;DR and Quick Start](#tldr-and-quick-start)
 - [Index](#index)
 - [Setup](#setup)
-    - [Installing](#installing)
-    - [Credentials](#credentials)
-        - [Option 1: API Key (Generative Language API)](#option-1-api-key-generative-language-api)
-        - [Option 2: Service Account Credentials File (Vertex AI API)](#option-2-service-account-credentials-file-vertex-ai-api)
-        - [Option 3: Application Default Credentials (Vertex AI API)](#option-3-application-default-credentials-vertex-ai-api)
-        - [Required Data](#required-data)
-    - [Custom Version](#custom-version)
+  - [Installing](#installing)
+  - [Credentials](#credentials)
+    - [Option 1: API Key (Generative Language API)](#option-1-api-key-generative-language-api)
+    - [Option 2: Service Account Credentials File (Vertex AI API)](#option-2-service-account-credentials-file-vertex-ai-api)
+    - [Option 3: Application Default Credentials (Vertex AI API)](#option-3-application-default-credentials-vertex-ai-api)
+    - [Required Data](#required-data)
+  - [Custom Version](#custom-version)
+- [Available Models](#available-models)
 - [Usage](#usage)
-    - [Client](#client)
-    - [Methods](#methods)
-        - [stream_generate_content](#stream_generate_content)
-            - [Receiving Stream Events](#receiving-stream-events)
-            - [Without Events](#without-events)
-        - [generate_content](#generate_content)
-    - [Modes](#modes)
-        - [Text](#text)
-        - [Image](#image)
-        - [Video](#video)
-    - [Streaming vs. Server-Sent Events (SSE)](#streaming-vs-server-sent-events-sse)
-        - [Server-Sent Events (SSE) Hang](#server-sent-events-sse-hang)
-        - [Non-Streaming](#non-streaming)
-    - [Back-and-Forth Conversations](#back-and-forth-conversations)
-    - [Tools (Functions) Calling](#tools-functions-calling)
-    - [New Functionalities and APIs](#new-functionalities-and-apis)
-    - [Request Options](#request-options)
-        - [Adapter](#adapter)
-        - [Timeout](#timeout)
-    - [Error Handling](#error-handling)
-        - [Rescuing](#rescuing)
-        - [For Short](#for-short)
-        - [Errors](#errors)
+  - [Client](#client)
+  - [Methods](#methods)
+    - [Chat](#chat)
+      - [stream_generate_content](#stream_generate_content)
+        - [Receiving Stream Events](#receiving-stream-events)
+        - [Without Events](#without-events)
+      - [generate_content](#generate_content)
+    - [Embeddings](#embeddings)
+      - [predict](#predict)
+      - [embed_content](#embed_content)
+  - [Modes](#modes)
+    - [Text](#text)
+    - [Image](#image)
+    - [Video](#video)
+  - [Streaming vs. Server-Sent Events (SSE)](#streaming-vs-server-sent-events-sse)
+    - [Server-Sent Events (SSE) Hang](#server-sent-events-sse-hang)
+    - [Non-Streaming](#non-streaming)
+  - [Back-and-Forth Conversations](#back-and-forth-conversations)
+  - [Tools (Functions) Calling](#tools-functions-calling)
+  - [New Functionalities and APIs](#new-functionalities-and-apis)
+  - [Request Options](#request-options)
+    - [Adapter](#adapter)
+    - [Timeout](#timeout)
+  - [Error Handling](#error-handling)
+    - [Rescuing](#rescuing)
+    - [For Short](#for-short)
+    - [Errors](#errors)
 - [Development](#development)
-    - [Purpose](#purpose)
-    - [Publish to RubyGems](#publish-to-rubygems)
-    - [Updating the README](#updating-the-readme)
+  - [Purpose](#purpose)
+  - [Publish to RubyGems](#publish-to-rubygems)
+  - [Updating the README](#updating-the-readme)
 - [Resources and References](#resources-and-references)
 - [Disclaimer](#disclaimer)
 
@@ -309,6 +314,43 @@ client = Gemini.new(
 )
 ```
 
+## Available Models
+
+These models are accessible to the repository **author** as of May 2025 in the `us-east4` region. Access to models may vary by region, user, and account. All models here are expected to work, if you can access them. This is just a reference of what a "typical" user may expect to have access to right away:
+
+| Model                                    | Vertex AI | Generative Language |
+|------------------------------------------|:---------:|:-------------------:|
+| gemini-pro-vision                        |    ✅     |          🔒         |
+| gemini-pro                               |    ✅     |          ✅         |
+| gemini-1.5-pro-preview-0514              |    ✅     |          🔒         |
+| gemini-1.5-pro-preview-0409              |    ✅     |          🔒         |
+| gemini-1.5-pro                           |    🔒     |          🔒         |
+| gemini-1.5-flash-preview-0514            |    ✅     |          🔒         |
+| gemini-1.5-flash                         |    🔒     |          🔒         |
+| gemini-1.0-pro-vision-latest             |    🔒     |          🔒         |
+| gemini-1.0-pro-vision-001                |    ✅     |          🔒         |
+| gemini-1.0-pro-vision                    |    ✅     |          🔒         |
+| gemini-1.0-pro-latest                    |    🔒     |          ✅         |
+| gemini-1.0-pro-002                       |    ✅     |          🔒         |
+| gemini-1.0-pro-001                       |    ✅     |          ✅         |
+| gemini-1.0-pro                           |    ✅     |          ✅         |
+| text-embedding-004                       |    ✅     |          ✅         |
+| embedding-001                            |    🔒     |          ✅         |
+| text-multilingual-embedding-002          |    ✅     |          🔒         |
+| textembedding-gecko-multilingual@001     |    ✅     |          🔒         |
+| textembedding-gecko-multilingual@latest  |    ✅     |          🔒         |
+| textembedding-gecko@001                  |    ✅     |          🔒         |
+| textembedding-gecko@002                  |    ✅     |          🔒         |
+| textembedding-gecko@003                  |    ✅     |          🔒         |
+| textembedding-gecko@latest               |    ✅     |          🔒         |
+
+You can follow new models at:
+
+- [Google models](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models)
+  - [Model versions and lifecycle](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/model-versioning)
+
+This is [the code](https://gist.github.com/gbaptista/d7390901293bce81ee12ff4ec5fed62c) used for generating this table that you can use to explore your own access.
+
 ## Usage
 
 ### Client
@@ -349,9 +391,11 @@ client = Gemini.new(
 
 ### Methods
 
-#### stream_generate_content
+#### Chat
 
-##### Receiving Stream Events
+##### stream_generate_content
+
+###### Receiving Stream Events
 
 Ensure that you have enabled [Server-Sent Events](#streaming-vs-server-sent-events-sse) before using blocks for streaming:
 
@@ -383,7 +427,7 @@ Event:
   } }
 ```
 
-##### Without Events
+###### Without Events
 
 You can use `stream_generate_content` without events:
 
@@ -423,7 +467,7 @@ result = client.stream_generate_content(
 end
 ```
 
-#### generate_content
+##### generate_content
 
 ```ruby
 result = client.generate_content(
@@ -451,6 +495,58 @@ Result:
 ```
 
 As of the writing of this README, only the `generative-language-api` service supports the `generate_content` method; `vertex-ai-api` does not.
+
+#### Embeddings
+
+##### predict
+
+Vertex AI API generates embeddings through the `predict` method ([documentation](https://cloud.google.com/vertex-ai/generative-ai/docs/embeddings/get-text-embeddings)), and you need a client set up to use an embedding model (e.g. `text-embedding-004`):
+
+```ruby
+result = client.predict(
+  { instances: [{ content: 'What is life?' }],
+    parameters: { autoTruncate: true } }
+)
+```
+
+Result:
+```ruby
+{ 'predictions' =>
+  [{ 'embeddings' =>
+     { 'statistics' => { 'truncated' => false, 'token_count' => 4 },
+       'values' =>
+       [-0.006861076690256596,
+        0.00020840796059928834,
+        -0.028549950569868088,
+        # ...
+        0.0020092015620321035,
+        0.03279878571629524,
+        -0.014905261807143688] } }],
+  'metadata' => { 'billableCharacterCount' => 11 } }
+```
+
+##### embed_content
+
+Generative Language API generates embeddings through the `embed_content` method ([documentation](https://ai.google.dev/api/rest/v1/models/embedContent)), and you need a client set up to use an embedding model (e.g. `text-embedding-004`):
+
+```ruby
+result = client.embed_content(
+  { content: { parts: [{ text: 'What is life?' }] } }
+)
+```
+
+Result:
+```ruby
+{ 'embedding' =>
+  { 'values' =>
+    [-0.0065307906,
+     -0.0001632607,
+     -0.028370803,
+
+     0.0019950708,
+     0.032798845,
+     -0.014878989] } }
+```
 
 ### Modes
 
@@ -904,12 +1000,25 @@ Which will result in:
 
 ### New Functionalities and APIs
 
-Google may launch a new endpoint that we haven't covered in the Gem yet. If that's the case, you may still be able to use it through the `request` method. For example, `stream_generate_content` is just a wrapper for `google/models/gemini-pro:streamGenerateContent`, which you can call directly like this:
+Google may launch a new endpoint that we haven't covered in the Gem yet. If that's the case, you may still be able to use it through the `request` method. For example, `stream_generate_content` is just a wrapper for `models/gemini-pro:streamGenerateContent` (Generative Language API) or `publishers/google/models/gemini-pro:streamGenerateContent` (Vertex AI API), which you can call directly like this:
 
 ```ruby
+# Generative Language API
 result = client.request(
-  'streamGenerateContent',
-  { contents: { role: 'user', parts: { text: 'hi!' } } }
+  'models/gemini-pro:streamGenerateContent',
+  { contents: { role: 'user', parts: { text: 'hi!' } } },
+  request_method: 'POST',
+  server_sent_events: true
+)
+```
+
+```ruby
+# Vertex AI API
+result = client.request(
+  'publishers/google/models/gemini-pro:streamGenerateContent',
+  { contents: { role: 'user', parts: { text: 'hi!' } } },
+  request_method: 'POST',
+  server_sent_events: true
 )
 ```
 
@@ -1083,6 +1192,9 @@ These resources and references may be useful throughout your learning process.
 - [Gemini API Documentation](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini)
 - [Vertex AI API Documentation](https://cloud.google.com/vertex-ai/docs/reference)
   - [REST Documentation](https://cloud.google.com/vertex-ai/docs/reference/rest)
+  - [Get text embeddings](https://cloud.google.com/vertex-ai/generative-ai/docs/embeddings/get-text-embeddings)
+- [Google models](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models)
+  - [Model versions and lifecycle](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/model-versioning)
 - [Google DeepMind Gemini](https://deepmind.google/technologies/gemini/)
 - [Stream responses from Generative AI models](https://cloud.google.com/vertex-ai/docs/generative-ai/learn/streaming)
 - [Function calling](https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/function-calling)
