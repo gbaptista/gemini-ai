@@ -864,8 +864,8 @@ Result:
 
 You can [configure safety attributes](https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/configure-safety-attributes) for your requests.
 
-[Harm Categories](https://ai.google.dev/api/rest/v1/HarmCategory):
-> `HARM_CATEGORY_UNSPECIFIED`, `HARM_CATEGORY_DEROGATORY`, `HARM_CATEGORY_TOXICITY`, `HARM_CATEGORY_VIOLENCE`, `HARM_CATEGORY_SEXUAL`, `HARM_CATEGORY_MEDICAL`, `HARM_CATEGORY_DANGEROUS`, `HARM_CATEGORY_HARASSMENT`, `HARM_CATEGORY_HATE_SPEECH`, `HARM_CATEGORY_SEXUALLY_EXPLICIT`, `HARM_CATEGORY_DANGEROUS_CONTENT`.
+Harm Categories:
+> `HARM_CATEGORY_UNSPECIFIED`, `HARM_CATEGORY_HARASSMENT`, `HARM_CATEGORY_HATE_SPEECH`, `HARM_CATEGORY_SEXUALLY_EXPLICIT`, `HARM_CATEGORY_DANGEROUS_CONTENT`.
 
 Thresholds:
 > `BLOCK_NONE`, `BLOCK_ONLY_HIGH`, `BLOCK_MEDIUM_AND_ABOVE`, `BLOCK_LOW_AND_ABOVE`, `HARM_BLOCK_THRESHOLD_UNSPECIFIED`.
@@ -877,7 +877,11 @@ client.stream_generate_content(
     contents: { role: 'user', parts: { text: 'hi!' } },
     safetySettings: [
       {
-        category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+        category: 'HARM_CATEGORY_UNSPECIFIED',
+        threshold: 'BLOCK_ONLY_HIGH'
+      },
+      {
+        category: 'HARM_CATEGORY_HARASSMENT',
         threshold: 'BLOCK_ONLY_HIGH'
       },
       {
@@ -885,7 +889,7 @@ client.stream_generate_content(
         threshold: 'BLOCK_ONLY_HIGH'
       },
       {
-        category: 'HARM_CATEGORY_HARASSMENT',
+        category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
         threshold: 'BLOCK_ONLY_HIGH'
       },
       {
