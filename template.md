@@ -809,6 +809,76 @@ Result:
    } }]
 ```
 
+### Safety Settings
+
+You can [configure safety attributes](https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/configure-safety-attributes) for your requests.
+
+[Harm Categories](https://ai.google.dev/api/rest/v1/HarmCategory):
+> `HARM_CATEGORY_UNSPECIFIED`, `HARM_CATEGORY_DEROGATORY`, `HARM_CATEGORY_TOXICITY`, `HARM_CATEGORY_VIOLENCE`, `HARM_CATEGORY_SEXUAL`, `HARM_CATEGORY_MEDICAL`, `HARM_CATEGORY_DANGEROUS`, `HARM_CATEGORY_HARASSMENT`, `HARM_CATEGORY_HATE_SPEECH`, `HARM_CATEGORY_SEXUALLY_EXPLICIT`, `HARM_CATEGORY_DANGEROUS_CONTENT`.
+
+Thresholds:
+> `BLOCK_NONE`, `BLOCK_ONLY_HIGH`, `BLOCK_MEDIUM_AND_ABOVE`, `BLOCK_LOW_AND_ABOVE`, `HARM_BLOCK_THRESHOLD_UNSPECIFIED`.
+
+Example:
+```ruby
+client.stream_generate_content(
+  {
+    contents: { role: 'user', parts: { text: 'hi!' } },
+    safetySettings: [
+      {
+        category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+        threshold: 'BLOCK_NONE'
+      },
+      {
+        category: 'HARM_CATEGORY_HATE_SPEECH',
+        threshold: 'BLOCK_NONE'
+      },
+      {
+        category: 'HARM_CATEGORY_HARASSMENT',
+        threshold: 'BLOCK_NONE'
+      },
+      {
+        category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+        threshold: 'BLOCK_NONE'
+      }
+    ]
+  }
+)
+```
+
+### System Instructions
+
+Some models support [system instructions](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/prompts/system-instructions):
+
+```ruby
+client.stream_generate_content(
+  { contents: { role: 'user', parts: { text: 'Hi! Who are you?' } },
+    system_instruction: { role: 'user', parts: { text: 'Your name is Neko.' } } }
+)
+```
+
+Output:
+```text
+Hi! I'm  Neko, a factual language model from Google AI.
+```
+
+```ruby
+client.stream_generate_content(
+  { contents: { role: 'user', parts: { text: 'Hi! Who are you?' } },
+    system_instruction: {
+      role: 'user', parts: [
+        { text: 'You are a cat.' },
+        { text: 'Your name is Neko.' }
+      ]
+    } }
+)
+```
+
+Output:
+```text
+Meow! I'm Neko, a fluffy and playful cat. :3
+```
+
 ### Tools (Functions) Calling
 
 > As of the writing of this README, only the `vertex-ai-api` service and the `gemini-pro` model [supports](https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/function-calling#supported_models) tools (functions) calls.
@@ -1149,6 +1219,8 @@ These resources and references may be useful throughout your learning process.
 - [Vertex AI API Documentation](https://cloud.google.com/vertex-ai/docs/reference)
   - [REST Documentation](https://cloud.google.com/vertex-ai/docs/reference/rest)
   - [Get text embeddings](https://cloud.google.com/vertex-ai/generative-ai/docs/embeddings/get-text-embeddings)
+  - [Use system instructions](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/prompts/system-instructions)
+  - [Configure safety attributes](https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/configure-safety-attributes)
 - [Google models](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models)
   - [Model versions and lifecycle](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/model-versioning)
 - [Google DeepMind Gemini](https://deepmind.google/technologies/gemini/)
