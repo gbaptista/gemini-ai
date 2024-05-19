@@ -1,3 +1,7 @@
 *.gem
 .devcontainer
 .env
+*.tmp
+*.temp
+temp.rb
+tmp.rb
