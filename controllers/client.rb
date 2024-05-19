@@ -46,12 +46,19 @@ module Gemini
 
         @service_version = config.dig(:credentials, :version) || DEFAULT_SERVICE_VERSION
 
-        @address = case @service
-                   when 'vertex-ai-api'
-                     "https://#{config[:credentials][:region]}-aiplatform.googleapis.com/#{@service_version}/projects/#{@project_id}/locations/#{config[:credentials][:region]}/publishers/google/models/#{config[:options][:model]}"
-                   when 'generative-language-api'
-                     "https://generativelanguage.googleapis.com/#{@service_version}/models/#{config[:options][:model]}"
-                   end
+        @base_address = case @service
+                        when 'vertex-ai-api'
+                          "https://#{config[:credentials][:region]}-aiplatform.googleapis.com/#{@service_version}/projects/#{@project_id}/locations/#{config[:credentials][:region]}"
+                        when 'generative-language-api'
+                          "https://generativelanguage.googleapis.com/#{@service_version}"
+                        end
+
+        @model_address = case @service
+                         when 'vertex-ai-api'
+                           "publishers/google/models/#{config[:options][:model]}"
+                         when 'generative-language-api'
+                           "models/#{config[:options][:model]}"
+                         end
 
         @server_sent_events = config.dig(:options, :server_sent_events)
 
@@ -68,21 +75,59 @@ module Gemini
                            end
       end
 
-      def stream_generate_content(payload, server_sent_events: nil, &callback)
-        request('streamGenerateContent', payload, server_sent_events:, &callback)
-      end
-
-      def generate_content(payload, server_sent_events: nil, &callback)
-        result = request('generateContent', payload, server_sent_events:, &callback)
+      def predict(payload, server_sent_events: nil, &callback)
+        result = request(
+          "#{@model_address}:predict", payload,
+          server_sent_events:, &callback
+        )
 
         return result.first if result.is_a?(Array) && result.size == 1
 
         result
       end
 
-      def request(path, payload, server_sent_events: nil, &callback)
+      def embed_content(payload, server_sent_events: nil, &callback)
+        result = request(
+          "#{@model_address}:embedContent", payload,
+          server_sent_events:, &callback
+        )
+
+        return result.first if result.is_a?(Array) && result.size == 1
+
+        result
+      end
+
+      def stream_generate_content(payload, server_sent_events: nil, &callback)
+        request("#{@model_address}:streamGenerateContent", payload, server_sent_events:, &callback)
+      end
+
+      def models(_server_sent_events: nil, &callback)
+        result = request(
+          'models',
+          nil, server_sent_events: false, request_method: 'GET', &callback
+        )
+
+        return result.first if result.is_a?(Array) && result.size == 1
+
+        result
+      end
+
+      def generate_content(payload, server_sent_events: nil, &callback)
+        result = request(
+          "#{@model_address}:generateContent", payload,
+          server_sent_events:, &callback
+        )
+
+        return result.first if result.is_a?(Array) && result.size == 1
+
+        result
+      end
+
+      def request(path, payload, server_sent_events: nil, request_method: 'POST', &callback)
         server_sent_events_enabled = server_sent_events.nil? ? @server_sent_events : server_sent_events
-        url = "#{@address}:#{path}"
+
+        url = "#{@base_address}/#{path}"
+
         params = []
 
         params << 'alt=sse' if server_sent_events_enabled
@@ -97,20 +142,21 @@ module Gemini
 
         results = []
 
+        method_to_call = request_method.to_s.strip.downcase.to_sym
+
         response = Faraday.new(request: @request_options) do |faraday|
           faraday.adapter @faraday_adapter
           faraday.response :raise_error
-        end.post do |request|
+        end.send(method_to_call) do |request|
           request.url url
           request.headers['Content-Type'] = 'application/json'
           if @authentication == :service_account || @authentication == :default_credentials
             request.headers['Authorization'] = "Bearer #{@authorizer.fetch_access_token!['access_token']}"
           end
 
-          request.body = payload.to_json
+          request.body = payload.to_json unless payload.nil?
 
           if server_sent_events_enabled
-
             partial_json = ''
 
             parser = EventStreamParser::Parser.new
