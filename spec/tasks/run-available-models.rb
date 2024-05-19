@@ -25,6 +25,11 @@ models = [
   'gemini-1.0-pro-002',
   'gemini-1.0-pro-001',
   'gemini-1.0-pro',
+  'gemini-ultra',
+  'gemini-1.0-ultra',
+  'gemini-1.0-ultra-001',
+  'text-embedding-preview-0514',
+  'text-embedding-preview-0409',
   'text-embedding-004',
   'embedding-001',
   'text-multilingual-embedding-002',
@@ -80,7 +85,7 @@ else
       }
 
       print '.'
-    rescue StandardError => e
+    rescue Faraday::BadRequestError, Faraday::ResourceNotFound => e
       results[key] = {
         service:, model:,
         result: 'error', output: e.message

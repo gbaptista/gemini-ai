@@ -336,6 +336,11 @@ These models are accessible to the repository **author** as of May 2025 in the `
 | gemini-1.0-pro-002                       |    ✅     |          🔒         |
 | gemini-1.0-pro-001                       |    ✅     |          ✅         |
 | gemini-1.0-pro                           |    ✅     |          ✅         |
+| gemini-ultra                             |    🔒     |          🔒         |
+| gemini-1.0-ultra                         |    🔒     |          🔒         |
+| gemini-1.0-ultra-001                     |    🔒     |          🔒         |
+| text-embedding-preview-0514              |    🔒     |          🔒         |
+| text-embedding-preview-0409              |    🔒     |          🔒         |
 | text-embedding-004                       |    ✅     |          ✅         |
 | embedding-001                            |    🔒     |          ✅         |
 | text-multilingual-embedding-002          |    ✅     |          🔒         |
@@ -873,24 +878,28 @@ client.stream_generate_content(
     safetySettings: [
       {
         category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-        threshold: 'BLOCK_NONE'
+        threshold: 'BLOCK_ONLY_HIGH'
       },
       {
         category: 'HARM_CATEGORY_HATE_SPEECH',
-        threshold: 'BLOCK_NONE'
+        threshold: 'BLOCK_ONLY_HIGH'
       },
       {
         category: 'HARM_CATEGORY_HARASSMENT',
-        threshold: 'BLOCK_NONE'
+        threshold: 'BLOCK_ONLY_HIGH'
       },
       {
         category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-        threshold: 'BLOCK_NONE'
+        threshold: 'BLOCK_ONLY_HIGH'
       }
     ]
   }
 )
 ```
+
+Google started to block the usage of `BLOCK_NONE` unless:
+
+> _User has requested a restricted HarmBlockThreshold setting BLOCK_NONE. You can get access either (a) through an allowlist via your Google account team, or (b) by switching your account type to monthly invoiced billing via this instruction: https://cloud.google.com/billing/docs/how-to/invoiced-billing_
 
 ### System Instructions
 
