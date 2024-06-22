@@ -102,6 +102,8 @@ Result:
   - [Back-and-Forth Conversations](#back-and-forth-conversations)
   - [Safety Settings](#safety-settings)
   - [System Instructions](#system-instructions)
+  - [JSON Format Responses](#json-format-responses)
+    - [JSON Schema](#json-schema)
   - [Tools (Functions) Calling](#tools-functions-calling)
   - [New Functionalities and APIs](#new-functionalities-and-apis)
   - [Request Options](#request-options)
@@ -936,6 +938,100 @@ client.stream_generate_content(
 Output:
 ```text
 Meow! I'm Neko, a fluffy and playful cat. :3
+```
+
+### JSON Format Responses
+
+> _As of the writing of this README, only the `vertex-ai-api` service and `gemini` models version `1.5` support this feature._
+
+The Gemini API provides a configuration parameter to [request a response in JSON](https://ai.google.dev/gemini-api/docs/api-overview#json) format:
+
+```ruby
+require 'json'
+
+result = client.stream_generate_content(
+  {
+    contents: {
+      role: 'user',
+      parts: {
+        text: 'List 3 random colors.'
+      }
+    },
+    generation_config: {
+      response_mime_type: 'application/json'
+    }
+
+  }
+)
+
+json_string = result
+              .map { |response| response.dig('candidates', 0, 'content', 'parts') }
+              .map { |parts| parts.map { |part| part['text'] }.join }
+              .join
+
+puts JSON.parse(json_string).inspect
+```
+
+Output:
+```ruby
+{ 'colors' => ['Dark Salmon', 'Indigo', 'Lavender'] }
+```
+
+#### JSON Schema
+
+> _As of the writing of this README, only the `vertex-ai-api` service and `gemini` models version `1.5` support this feature._
+
+You can also provide a [JSON Schema](https://json-schema.org) for the expected JSON output:
+
+```ruby
+require 'json'
+
+result = client.stream_generate_content(
+  {
+    contents: {
+      role: 'user',
+      parts: {
+        text: 'List 3 random colors.'
+      }
+    },
+    generation_config: {
+      response_mime_type: 'application/json',
+      response_schema: {
+        type: 'object',
+        properties: {
+          colors: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                name: {
+                  type: 'string'
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+)
+
+json_string = result
+              .map { |response| response.dig('candidates', 0, 'content', 'parts') }
+              .map { |parts| parts.map { |part| part['text'] }.join }
+              .join
+
+puts JSON.parse(json_string).inspect
+```
+
+Output:
+
+```ruby
+{ 'colors' => [
+  { 'name' => 'Lavender Blush' },
+  { 'name' => 'Medium Turquoise' },
+  { 'name' => 'Dark Slate Gray' }
+] }
 ```
 
 ### Tools (Functions) Calling
