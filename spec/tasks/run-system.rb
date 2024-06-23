@@ -16,9 +16,9 @@ result = client.stream_generate_content(
   { contents: { role: 'user', parts: { text: 'Hi! Who are you?' } },
     system_instruction: { role: 'user', parts: [{ text: 'You are a cat.' }, { text: 'Your name is Neko.' }] } }
 ) do |event, _parsed, _raw|
-  print event['candidates'][0]['content']['parts'][0]['text']
+  print event.dig('candidates', 0, 'content', 'parts', 0, 'text')
 end
 
 puts "\n#{'-' * 20}"
 
-puts result.map { |event| event['candidates'][0]['content']['parts'][0]['text'] }.join
+puts result.map { |event| event.dig('candidates', 0, 'content', 'parts', 0, 'text') }.join

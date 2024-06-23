@@ -21,22 +21,24 @@ module Gemini
         @service = config[:credentials][:service]
 
         unless %w[vertex-ai-api generative-language-api].include?(@service)
-          raise Errors::UnsupportedServiceError, "Unsupported service: #{@service}"
+          raise Errors::UnsupportedServiceError, "Unsupported service: '#{@service}'."
         end
+
+        avoid_conflicting_credentials!(config[:credentials])
 
         if config[:credentials][:api_key]
           @authentication = :api_key
           @api_key = config[:credentials][:api_key]
-        elsif config[:credentials][:file_path]
+        elsif config[:credentials][:file_path] || config[:credentials][:file_contents]
           @authentication = :service_account
+          json_key_io = if config[:credentials][:file_path]
+                          File.open(config[:credentials][:file_path])
+                        else
+                          StringIO.new(config[:credentials][:file_contents])
+                        end
+
           @authorizer = ::Google::Auth::ServiceAccountCredentials.make_creds(
-            json_key_io: File.open(config[:credentials][:file_path]),
-            scope: 'https://www.googleapis.com/auth/cloud-platform'
-          )
-        elsif config[:credentials][:file_contents]
-          @authentication = :service_account
-          @authorizer = ::Google::Auth::ServiceAccountCredentials.make_creds(
-            json_key_io: StringIO.new(config[:credentials][:file_contents]),
+            json_key_io:,
             scope: 'https://www.googleapis.com/auth/cloud-platform'
           )
         else
@@ -79,6 +81,21 @@ module Gemini
                            else
                              {}
                            end
+      end
+
+      def avoid_conflicting_credentials!(credentials)
+        conflicting_keys = %i[api_key file_path file_contents]
+
+        found = credentials.keys.filter { |key| conflicting_keys.include?(key) }
+
+        return unless found.size > 1
+
+        message = found.sort.each_with_index.map do |key, i|
+          i == found.size - 1 ? "or '#{key}'" : "'#{key}'"
+        end.join(', ')
+
+        raise Errors::ConflictingCredentialsError,
+              "You must choose either #{message}."
       end
 
       def predict(payload, server_sent_events: nil, &callback)

@@ -4,12 +4,13 @@ module Gemini
   module Errors
     class GeminiError < StandardError
       def initialize(message = nil)
-        super(message)
+        super
       end
     end
 
     class MissingProjectIdError < GeminiError; end
     class UnsupportedServiceError < GeminiError; end
+    class ConflictingCredentialsError < GeminiError; end
     class BlockWithoutServerSentEventsError < GeminiError; end
 
     class RequestError < GeminiError

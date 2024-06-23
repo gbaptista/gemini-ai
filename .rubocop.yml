@@ -4,3 +4,6 @@ AllCops:
 
 Style/Documentation:
   Enabled: false
+
+require:
+ - rubocop-rspec
