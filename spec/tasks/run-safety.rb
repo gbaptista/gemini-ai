@@ -20,9 +20,9 @@ result = client.stream_generate_content(
                      { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
                      { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' }] }
 ) do |event, _parsed, _raw|
-  print event['candidates'][0]['content']['parts'][0]['text']
+  print event.dig('candidates', 0, 'content', 'parts', 0, 'text')
 end
 
 puts "\n#{'-' * 20}"
 
-puts result.map { |event| event['candidates'][0]['content']['parts'][0]['text'] }.join
+puts result.map { |event| event.dig('candidates', 0, 'content', 'parts', 0, 'text') }.join

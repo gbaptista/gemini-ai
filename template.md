@@ -1318,7 +1318,14 @@ RequestError
 bundle
 rubocop -A
 
-bundle exec ruby spec/tasks/run-client.rb
+rspec
+
+bundle exec ruby spec/tasks/run-available-models.rb
+bundle exec ruby spec/tasks/run-embed.rb
+bundle exec ruby spec/tasks/run-generate.rb
+bundle exec ruby spec/tasks/run-json.rb
+bundle exec ruby spec/tasks/run-safety.rb
+bundle exec ruby spec/tasks/run-system.rb
 ```
 
 ### Purpose
