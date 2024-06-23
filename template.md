@@ -34,6 +34,17 @@ client = Gemini.new(
   options: { model: 'gemini-pro', server_sent_events: true }
 )
 
+# With a Service Account Credentials File Contents
+client = Gemini.new(
+  credentials: {
+    service: 'vertex-ai-api',
+    file_contents: File.read('google-credentials.json'),
+    # file_contents: ENV['GOOGLE_CREDENTIALS_FILE_CONTENTS'],
+    region: 'us-east4'
+  },
+  options: { model: 'gemini-pro', server_sent_events: true }
+)
+
 # With Application Default Credentials
 client = Gemini.new(
   credentials: {
@@ -163,7 +174,7 @@ Similar to [Option 2](#option-2-service-account-credentials-file-vertex-ai-api),
 For local development, you can generate your default credentials using the [gcloud CLI](https://cloud.google.com/sdk/gcloud) as follows:
 
 ```sh
-gcloud auth application-default login 
+gcloud auth application-default login
 ```
 
 For more details about alternative methods and different environments, check the official documentation:
@@ -197,6 +208,23 @@ Remember that hardcoding your API key in code is unsafe; it's preferable to use 
 {
   service: 'vertex-ai-api',
   file_path: 'google-credentials.json',
+  region: 'us-east4'
+}
+```
+
+Alternatively, you can pass the file contents instead of the path:
+```ruby
+{
+  service: 'vertex-ai-api',
+  file_contents: File.read('google-credentials.json'),
+  region: 'us-east4'
+}
+```
+
+```ruby
+{
+  service: 'vertex-ai-api',
+  file_contents: ENV['GOOGLE_CREDENTIALS_FILE_CONTENTS'],
   region: 'us-east4'
 }
 ```
@@ -255,6 +283,17 @@ client = Gemini.new(
     file_path: 'google-credentials.json',
     region: 'us-east4',
     version: 'v1beta'
+  },
+  options: { model: 'gemini-pro', server_sent_events: true }
+)
+
+# With a Service Account Credentials File Contents
+client = Gemini.new(
+  credentials: {
+    service: 'vertex-ai-api',
+    file_contents: File.read('google-credentials.json'),
+    # file_contents: ENV['GOOGLE_CREDENTIALS_FILE_CONTENTS'],
+    region: 'us-east4'
   },
   options: { model: 'gemini-pro', server_sent_events: true }
 )
@@ -335,6 +374,17 @@ client = Gemini.new(
   credentials: {
     service: 'vertex-ai-api',
     file_path: 'google-credentials.json',
+    region: 'us-east4'
+  },
+  options: { model: 'gemini-pro', server_sent_events: true }
+)
+
+# With a Service Account Credentials File Contents
+client = Gemini.new(
+  credentials: {
+    service: 'vertex-ai-api',
+    file_contents: File.read('google-credentials.json'),
+    # file_contents: ENV['GOOGLE_CREDENTIALS_FILE_CONTENTS'],
     region: 'us-east4'
   },
   options: { model: 'gemini-pro', server_sent_events: true }
