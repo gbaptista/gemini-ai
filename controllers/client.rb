@@ -33,6 +33,12 @@ module Gemini
             json_key_io: File.open(config[:credentials][:file_path]),
             scope: 'https://www.googleapis.com/auth/cloud-platform'
           )
+        elsif config[:credentials][:file_contents]
+          @authentication = :service_account
+          @authorizer = ::Google::Auth::ServiceAccountCredentials.make_creds(
+            json_key_io: StringIO.new(config[:credentials][:file_contents]),
+            scope: 'https://www.googleapis.com/auth/cloud-platform'
+          )
         else
           @authentication = :default_credentials
           @authorizer = ::Google::Auth.get_application_default
