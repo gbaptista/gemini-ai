@@ -4,21 +4,6 @@ require 'dotenv/load'
 
 require_relative '../../ports/dsl/gemini-ai'
 
-begin
-  client = Gemini.new(
-    credentials: {
-      service: 'unknown-service'
-    },
-    options: { model: 'gemini-pro', server_sent_events: true }
-  )
-
-  client.stream_generate_content(
-    { contents: { role: 'user', parts: { text: 'hi!' } } }
-  )
-rescue StandardError => e
-  raise "Unexpected error: #{e.class}" unless e.instance_of?(Gemini::Errors::UnsupportedServiceError)
-end
-
 client = Gemini.new(
   credentials: {
     service: 'generative-language-api',

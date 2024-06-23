@@ -21,15 +21,14 @@ module Gemini
         @service = config[:credentials][:service]
 
         unless %w[vertex-ai-api generative-language-api].include?(@service)
-          raise Errors::UnsupportedServiceError, "Unsupported service: #{@service}"
+          raise Errors::UnsupportedServiceError, "Unsupported service: '#{@service}'."
         end
+
+        avoid_conflicting_credentials!(config[:credentials])
 
         if config[:credentials][:api_key]
           @authentication = :api_key
           @api_key = config[:credentials][:api_key]
-        elsif config[:credentials].key?(:file_path) && config[:credentials].key?(:file_contents)
-          raise Errors::ConflictingCredentialsError,
-                "You must choose 'file_path' or 'file_contents,' not both."
         elsif config[:credentials][:file_path] || config[:credentials][:file_contents]
           @authentication = :service_account
           json_key_io = if config[:credentials][:file_path]
@@ -82,6 +81,21 @@ module Gemini
                            else
                              {}
                            end
+      end
+
+      def avoid_conflicting_credentials!(credentials)
+        conflicting_keys = %i[api_key file_path file_contents]
+
+        found = credentials.keys.filter { |key| conflicting_keys.include?(key) }
+
+        return unless found.size > 1
+
+        message = found.sort.each_with_index.map do |key, i|
+          i == found.size - 1 ? "or '#{key}'" : "'#{key}'"
+        end.join(', ')
+
+        raise Errors::ConflictingCredentialsError,
+              "You must choose either #{message}."
       end
 
       def predict(payload, server_sent_events: nil, &callback)
