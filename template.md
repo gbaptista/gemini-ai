@@ -34,7 +34,7 @@ client = Gemini.new(
   options: { model: 'gemini-pro', server_sent_events: true }
 )
 
-# With a Service Account Credentials File Contents
+# With the Service Account Credentials File contents
 client = Gemini.new(
   credentials: {
     service: 'vertex-ai-api',
@@ -287,7 +287,7 @@ client = Gemini.new(
   options: { model: 'gemini-pro', server_sent_events: true }
 )
 
-# With a Service Account Credentials File Contents
+# With the Service Account Credentials File contents
 client = Gemini.new(
   credentials: {
     service: 'vertex-ai-api',
@@ -379,7 +379,7 @@ client = Gemini.new(
   options: { model: 'gemini-pro', server_sent_events: true }
 )
 
-# With a Service Account Credentials File Contents
+# With the Service Account Credentials File contents
 client = Gemini.new(
   credentials: {
     service: 'vertex-ai-api',
