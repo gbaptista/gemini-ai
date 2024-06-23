@@ -311,7 +311,7 @@ client = Gemini.new(
 
 ## Available Models
 
-These models are accessible to the repository **author** as of May 2025 in the `us-east4` region. Access to models may vary by region, user, and account. All models here are expected to work, if you can access them. This is just a reference of what a "typical" user may expect to have access to right away:
+These models are accessible to the repository **author** as of June 2025 in the `us-east4` region. Access to models may vary by region, user, and account. All models here are expected to work, if you can access them. This is just a reference of what a "typical" user may expect to have access to right away:
 
 | Model                                    | Vertex AI | Generative Language |
 |------------------------------------------|:---------:|:-------------------:|
@@ -319,9 +319,9 @@ These models are accessible to the repository **author** as of May 2025 in the `
 | gemini-pro                               |    ✅     |          ✅         |
 | gemini-1.5-pro-preview-0514              |    ✅     |          🔒         |
 | gemini-1.5-pro-preview-0409              |    ✅     |          🔒         |
-| gemini-1.5-pro                           |    🔒     |          🔒         |
+| gemini-1.5-pro                           |    ✅     |          ✅         |
 | gemini-1.5-flash-preview-0514            |    ✅     |          🔒         |
-| gemini-1.5-flash                         |    🔒     |          🔒         |
+| gemini-1.5-flash                         |    ✅     |          ✅         |
 | gemini-1.0-pro-vision-latest             |    🔒     |          🔒         |
 | gemini-1.0-pro-vision-001                |    ✅     |          🔒         |
 | gemini-1.0-pro-vision                    |    ✅     |          🔒         |
@@ -981,7 +981,7 @@ Output:
 
 #### JSON Schema
 
-> _As of the writing of this README, only the `vertex-ai-api` service and `gemini` models version `1.5` support this feature._
+> _While Gemini 1.5 Flash models only accept a text description of the JSON schema you want returned, the Gemini 1.5 Pro models let you pass a schema object (or a Python type equivalent), and the model output will strictly follow that schema. This is also known as controlled generation or constrained decoding._
 
 You can also provide a [JSON Schema](https://json-schema.org) for the expected JSON output:
 
@@ -1035,6 +1035,36 @@ Output:
   { 'name' => 'Dark Slate Gray' }
 ] }
 ```
+
+#### Models That Support JSON
+
+These models are accessible to the repository **author** as of June 2025 in the `us-east4` region. Access to models may vary by region, user, and account.
+
+- ❌ Does not support JSON mode.
+- 🟡 Supports JSON mode but not Schema.
+- ✅ Supports JSON mode and Schema.
+- 🔒 I don't have access to the model.
+
+| Model                                    | Vertex AI | Generative Language |
+|------------------------------------------|:---------:|:-------------------:|
+| gemini-pro-vision                        |    ❌     |          🔒         |
+| gemini-pro                               |    🟡     |          ❌         |
+| gemini-1.5-pro-preview-0514              |    ✅     |          🔒         |
+| gemini-1.5-pro-preview-0409              |    ✅     |          🔒         |
+| gemini-1.5-pro                           |    ✅     |          ❌         |
+| gemini-1.5-flash-preview-0514            |    🟡     |          🔒         |
+| gemini-1.5-flash                         |    🟡     |          ❌         |
+| gemini-1.0-pro-vision-latest             |    🔒     |          🔒         |
+| gemini-1.0-pro-vision-001                |    ❌     |          🔒         |
+| gemini-1.0-pro-vision                    |    ❌     |          🔒         |
+| gemini-1.0-pro-latest                    |    🔒     |          ❌         |
+| gemini-1.0-pro-002                       |    🟡     |          🔒         |
+| gemini-1.0-pro-001                       |    ❌     |          ❌         |
+| gemini-1.0-pro                           |    🟡     |          ❌         |
+| gemini-ultra                             |    🔒     |          🔒         |
+| gemini-1.0-ultra                         |    🔒     |          🔒         |
+| gemini-1.0-ultra-001                     |    🔒     |          🔒         |
+
 
 ### Tools (Functions) Calling
 
