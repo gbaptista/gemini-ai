@@ -163,7 +163,7 @@ Similar to [Option 2](#option-2-service-account-credentials-file-vertex-ai-api),
 For local development, you can generate your default credentials using the [gcloud CLI](https://cloud.google.com/sdk/gcloud) as follows:
 
 ```sh
-gcloud auth application-default login
+gcloud auth application-default login 
 ```
 
 For more details about alternative methods and different environments, check the official documentation:
@@ -201,17 +201,7 @@ Remember that hardcoding your API key in code is unsafe; it's preferable to use 
 }
 ```
 
-**Option 3**: For the Service Account, provide the raw contents of a `google-credentials.json` file and a `REGION`:
-
-```ruby
-{
-  service: 'vertex-ai-api',
-  file_contents: ENV['GOOGLE_CREDENTIALS_FILE_CONTENTS'],
-  region: 'us-east4'
-}
-```
-
-**Option 4**: For _Application Default Credentials_, omit both the `api_key` and the `file_path`:
+**Option 3**: For _Application Default Credentials_, omit both the `api_key` and the `file_path`:
 
 ```ruby
 {
@@ -1266,6 +1256,7 @@ GeminiError
 
 MissingProjectIdError
 UnsupportedServiceError
+ConflictingCredentialsError
 BlockWithoutServerSentEventsError
 
 RequestError

@@ -10,6 +10,7 @@ module Gemini
 
     class MissingProjectIdError < GeminiError; end
     class UnsupportedServiceError < GeminiError; end
+    class ConflictingCredentialsError < GeminiError; end
     class BlockWithoutServerSentEventsError < GeminiError; end
 
     class RequestError < GeminiError

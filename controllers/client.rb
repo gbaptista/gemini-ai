@@ -27,16 +27,19 @@ module Gemini
         if config[:credentials][:api_key]
           @authentication = :api_key
           @api_key = config[:credentials][:api_key]
-        elsif config[:credentials][:file_path]
+        elsif config[:credentials].key?(:file_path) && config[:credentials].key?(:file_contents)
+          raise Errors::ConflictingCredentialsError,
+                "You must choose 'file_path' or 'file_contents,' not both."
+        elsif config[:credentials][:file_path] || config[:credentials][:file_contents]
           @authentication = :service_account
+          json_key_io = if config[:credentials][:file_path]
+                          File.open(config[:credentials][:file_path])
+                        else
+                          StringIO.new(config[:credentials][:file_contents])
+                        end
+
           @authorizer = ::Google::Auth::ServiceAccountCredentials.make_creds(
-            json_key_io: File.open(config[:credentials][:file_path]),
-            scope: 'https://www.googleapis.com/auth/cloud-platform'
-          )
-        elsif config[:credentials][:file_contents]
-          @authentication = :service_account
-          @authorizer = ::Google::Auth::ServiceAccountCredentials.make_creds(
-            json_key_io: StringIO.new(config[:credentials][:file_contents]),
+            json_key_io:,
             scope: 'https://www.googleapis.com/auth/cloud-platform'
           )
         else
