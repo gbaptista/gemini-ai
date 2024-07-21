@@ -113,6 +113,7 @@ Result:
   - [Back-and-Forth Conversations](#back-and-forth-conversations)
   - [Safety Settings](#safety-settings)
   - [System Instructions](#system-instructions)
+  - [Counting Tokens](#counting-tokens)
   - [JSON Format Responses](#json-format-responses)
     - [JSON Schema](#json-schema)
     - [Models That Support JSON](#models-that-support-json)
@@ -989,6 +990,27 @@ client.stream_generate_content(
 Output:
 ```text
 Meow! I'm Neko, a fluffy and playful cat. :3
+```
+
+### Counting Tokens
+
+You can [count tokens](https://ai.google.dev/gemini-api/docs/tokens#count-tokens) and preview how many tokens a request is expected to consume:
+
+```ruby
+client.count_tokens(
+  { contents: { role: 'user', parts: { text: 'hi!' } } }
+)
+```
+
+Output for Generative Language API:
+```ruby
+{ 'totalTokens' => 3 }
+```
+
+Output for Vertex AI API:
+
+```ruby
+{ 'totalTokens' => 2, 'totalBillableCharacters' => 3 }
 ```
 
 ### JSON Format Responses

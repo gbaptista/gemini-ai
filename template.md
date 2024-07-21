@@ -942,6 +942,27 @@ Output:
 Meow! I'm Neko, a fluffy and playful cat. :3
 ```
 
+### Counting Tokens
+
+You can [count tokens](https://ai.google.dev/gemini-api/docs/tokens#count-tokens) and preview how many tokens a request is expected to consume:
+
+```ruby
+client.count_tokens(
+  { contents: { role: 'user', parts: { text: 'hi!' } } }
+)
+```
+
+Output for Generative Language API:
+```ruby
+{ 'totalTokens' => 3 }
+```
+
+Output for Vertex AI API:
+
+```ruby
+{ 'totalTokens' => 2, 'totalBillableCharacters' => 3 }
+```
+
 ### JSON Format Responses
 
 > _As of the writing of this README, only the `vertex-ai-api` service and `gemini` models version `1.5` support this feature._
