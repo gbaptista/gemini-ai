@@ -109,6 +109,17 @@ module Gemini
         result
       end
 
+      def count_tokens(payload, server_sent_events: nil, &callback)
+        result = request(
+          "#{@model_address}:countTokens", payload,
+          server_sent_events:, &callback
+        )
+
+        return result.first if result.is_a?(Array) && result.size == 1
+
+        result
+      end
+
       def embed_content(payload, server_sent_events: nil, &callback)
         result = request(
           "#{@model_address}:embedContent", payload,
