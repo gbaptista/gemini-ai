@@ -1,9 +1,9 @@
 PATH
   remote: .
   specs:
-    gemini-ai (4.1.0)
+    gemini-ai (4.2.0)
       event_stream_parser (~> 1.0)
-      faraday (~> 2.9, >= 2.9.2)
+      faraday (~> 2.10)
       faraday-typhoeus (~> 1.1)
       googleauth (~> 1.8)
       typhoeus (~> 1.4, >= 1.4.1)
@@ -22,8 +22,9 @@ GEM
     ethon (0.16.0)
       ffi (>= 1.15.0)
     event_stream_parser (1.0.0)
-    faraday (2.9.2)
+    faraday (2.10.0)
       faraday-net_http (>= 2.0, < 3.2)
+      logger
     faraday-net_http (3.1.0)
       net-http
     faraday-typhoeus (1.1.0)
@@ -43,13 +44,14 @@ GEM
     jwt (2.8.2)
       base64
     language_server-protocol (3.17.0.3)
+    logger (1.6.0)
     method_source (1.1.0)
     multi_json (1.15.0)
     net-http (0.4.1)
       uri
     os (1.1.4)
     parallel (1.25.1)
-    parser (3.3.3.0)
+    parser (3.3.4.0)
       ast (~> 2.4.1)
       racc
     pry (0.14.2)
@@ -62,7 +64,7 @@ GEM
     racc (1.8.0)
     rainbow (3.1.1)
     regexp_parser (2.9.2)
-    rexml (3.3.0)
+    rexml (3.3.2)
       strscan
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
@@ -77,20 +79,20 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.1)
-    rubocop (1.64.1)
+    rubocop (1.65.0)
       json (~> 2.3)
       language_server-protocol (>= 3.17.0)
       parallel (~> 1.10)
       parser (>= 3.3.0.2)
       rainbow (>= 2.2.2, < 4.0)
-      regexp_parser (>= 1.8, < 3.0)
+      regexp_parser (>= 2.4, < 3.0)
       rexml (>= 3.2.5, < 4.0)
       rubocop-ast (>= 1.31.1, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 2.4.0, < 3.0)
     rubocop-ast (1.31.3)
       parser (>= 3.3.1.0)
-    rubocop-rspec (3.0.1)
+    rubocop-rspec (3.0.3)
       rubocop (~> 1.61)
     ruby-progressbar (1.13.0)
     signet (0.19.0)
@@ -112,8 +114,8 @@ DEPENDENCIES
   gemini-ai!
   pry-byebug (~> 3.10, >= 3.10.1)
   rspec (~> 3.13)
-  rubocop (~> 1.64, >= 1.64.1)
-  rubocop-rspec (~> 3.0, >= 3.0.1)
+  rubocop (~> 1.65)
+  rubocop-rspec (~> 3.0, >= 3.0.3)
 
 BUNDLED WITH
    2.4.22
