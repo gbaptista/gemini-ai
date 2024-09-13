@@ -45,4 +45,64 @@ RSpec.describe Gemini do
       "You must choose either 'file_contents', or 'file_path'."
     )
   end
+
+  describe 'custom base address' do
+    it 'uses the custom base address when provided' do
+      custom_base_address = 'https://custom-gemini-api.example.com/v1'
+      client = described_class.new(
+        credentials: {
+          service: 'vertex-ai-api',
+          region: 'us-east4',
+          base_address: custom_base_address,
+          api_key: 'key'
+        },
+        options: { model: 'gemini-pro' }
+      )
+
+      expect(client.base_address).to eq(custom_base_address)
+    end
+
+    it 'uses the default base address when not provided' do
+      client = described_class.new(
+        credentials: {
+          service: 'vertex-ai-api',
+          region: 'us-east4',
+          api_key: 'key'
+        },
+        options: { model: 'gemini-pro' }
+      )
+
+      expect(client.base_address).to include('aiplatform.googleapis.com')
+    end
+  end
+
+  describe 'custom headers' do
+    let(:stubs) { Faraday::Adapter::Test::Stubs.new }
+    let(:faraday_test_adapter) { :test }
+
+    it 'sends custom headers with the request' do
+      custom_headers = { 'X-Custom-Header' => 'CustomValue' }
+
+      stubs.post(/.*/) do |env|
+        expect(env.request_headers).to include(custom_headers)
+        [200, {}, '{}']
+      end
+
+      client = described_class.new(
+        credentials: {
+          service: 'vertex-ai-api',
+          region: 'us-east4',
+          api_key: 'key'
+        },
+        options: {
+          model: 'gemini-pro',
+          headers: custom_headers,
+          connection: { adapter: [:test, stubs] }
+        }
+      )
+
+      client.predict({ content: 'Test' })
+      stubs.verify_stubbed_calls
+    end
+  end
 end
