@@ -56,7 +56,11 @@ module Gemini
 
         @base_address = case @service
                         when 'vertex-ai-api'
-                          "https://#{config[:credentials][:region]}-aiplatform.googleapis.com/#{@service_version}/projects/#{@project_id}/locations/#{config[:credentials][:region]}"
+                          if config[:credentials][:region] == 'global'
+                            "https://aiplatform.googleapis.com/#{@service_version}/projects/#{@project_id}/locations/#{config[:credentials][:region]}"
+                          else
+                            "https://#{config[:credentials][:region]}-aiplatform.googleapis.com/#{@service_version}/projects/#{@project_id}/locations/#{config[:credentials][:region]}"
+                          end
                         when 'generative-language-api'
                           "https://generativelanguage.googleapis.com/#{@service_version}"
                         end
