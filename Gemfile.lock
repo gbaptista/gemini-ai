@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    gemini-ai (4.2.0)
+    gemini-ai (4.3.0)
       event_stream_parser (~> 1.0)
       faraday (~> 2.13, >= 2.13.2)
       faraday-typhoeus (~> 1.1)

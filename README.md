@@ -9,7 +9,7 @@ A Ruby Gem for interacting with [Gemini](https://deepmind.google/technologies/ge
 ## TL;DR and Quick Start
 
 ```ruby
-gem 'gemini-ai', '~> 4.2.0'
+gem 'gemini-ai', '~> 4.3.0'
 ```
 
 ```ruby
@@ -145,11 +145,11 @@ Result:
 ### Installing
 
 ```sh
-gem install gemini-ai -v 4.2.0
+gem install gemini-ai -v 4.3.0
 ```
 
 ```sh
-gem 'gemini-ai', '~> 4.2.0'
+gem 'gemini-ai', '~> 4.3.0'
 ```
 
 ### Credentials
@@ -1455,7 +1455,7 @@ gem build gemini-ai.gemspec
 
 gem signin
 
-gem push gemini-ai-4.2.0.gem
+gem push gemini-ai-4.3.0.gem
 ```
 
 ### Updating the README
