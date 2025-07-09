@@ -59,6 +59,12 @@ result = client.stream_generate_content({
 })
 ```
 
+Google now supports a [global endpoint](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations#global-endpoint):
+
+```ruby
+Gemini.new(credentials: { region: 'global' })
+```
+
 Result:
 ```ruby
 [{ 'candidates' =>
@@ -91,6 +97,7 @@ Result:
     - [Option 3: Application Default Credentials (Vertex AI API)](#option-3-application-default-credentials-vertex-ai-api)
     - [Required Data](#required-data)
   - [Custom Version](#custom-version)
+  - [Global Endpoint](#global-endpoint)
 - [Available Models](#available-models)
 - [Usage](#usage)
   - [Client](#client)
@@ -357,6 +364,14 @@ client = Gemini.new(
   },
   options: { model: 'gemini-pro', server_sent_events: true }
 )
+```
+
+### Global Endpoint
+
+Google now supports a [global endpoint](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations#global-endpoint):
+
+```ruby
+Gemini.new(credentials: { region: 'global' })
 ```
 
 ## Available Models
