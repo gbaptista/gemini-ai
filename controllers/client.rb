@@ -79,9 +79,7 @@ module Gemini
         @faraday_adapter = config.dig(:options, :connection, :adapter) || DEFAULT_FARADAY_ADAPTER
 
         @request_options = if @request_options.is_a?(Hash)
-                             @request_options.select do |key, _|
-                               ALLOWED_REQUEST_OPTIONS.include?(key)
-                             end
+                             @request_options.slice(*ALLOWED_REQUEST_OPTIONS)
                            else
                              {}
                            end

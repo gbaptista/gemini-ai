@@ -5,9 +5,9 @@ source 'https://rubygems.org'
 gemspec
 
 group :test, :development do
-  gem 'dotenv', '~> 3.1', '>= 3.1.2'
-  gem 'pry-byebug', '~> 3.10', '>= 3.10.1'
-  gem 'rspec', '~> 3.13'
-  gem 'rubocop', '~> 1.65'
-  gem 'rubocop-rspec', '~> 3.0', '>= 3.0.3'
+  gem 'dotenv', '~> 3.1', '>= 3.1.8'
+  gem 'pry-byebug', '~> 3.11'
+  gem 'rspec', '~> 3.13', '>= 3.13.1'
+  gem 'rubocop', '~> 1.78'
+  gem 'rubocop-rspec', '~> 3.6'
 end
