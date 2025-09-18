@@ -573,6 +573,46 @@ Result:
      -0.014878989] } }
 ```
 
+##### batch_embed_content
+
+The Generative Language API allows you to generates embedding for multiple strings at the same time using the `batch_embed_content` method ([documentation](https://ai.google.dev/api/embeddings#method:-models.batchembedcontents)).
+
+```ruby
+result = client.batch_embed_content(
+  {
+    requests: [
+      {
+        model: 'models/text-embedding-004',
+        content: { parts: [{ text: 'What is life?' }] } },
+        output_dimensionality: 64,
+        task_type: 'CLUSTERING'
+      },
+      {
+        model: 'models/text-embedding-004',
+        content: { parts: [{ text: 'What is the meaning of life?' }] }
+      }
+    ],
+  }
+)
+```
+
+Result:
+```ruby
+{"embeddings" =>
+  [{"values" =>
+     [-0.0065307966,
+      -0.000163254,
+      -0.0283708,
+      ...
+      -0.02459646]},
+   {"values" =>
+     [-0.010632273,
+      0.019375853,
+      -0.006665491,
+      ...
+      -0.024252947]}]}
+```
+
 ### Modes
 
 #### Text

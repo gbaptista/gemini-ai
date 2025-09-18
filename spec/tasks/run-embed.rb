@@ -22,6 +22,29 @@ puts result.keys
 
 puts '-' * 20
 
+result = client.batch_embed_content(
+  {
+    requests: [
+      {
+        model: 'models/text-embedding-004',
+        content: { parts: [ {text: 'What is life?' } ] },
+        output_dimensionality: 64,
+        task_type: "CLUSTERING"
+      },
+      {
+        model: 'models/text-embedding-004',
+        content: { parts: [ {text: 'What is the meaning of life?' } ] },
+        output_dimensionality: 64,
+        task_type: "CLUSTERING"
+      }
+    ]
+  }
+)
+
+puts result.keys
+
+puts '-' * 20
+
 client = Gemini.new(
   credentials: {
     service: 'vertex-ai-api',

@@ -133,6 +133,17 @@ module Gemini
         result
       end
 
+      def batch_embed_content(payload, server_sent_events: nil, &callback)
+        result = request(
+          "#{@model_address}:batchEmbedContents", payload,
+          server_sent_events:, &callback
+        )
+
+        return result.first if result.is_a?(Array) && result.size == 1
+
+        result
+      end
+
       def stream_generate_content(payload, server_sent_events: nil, &callback)
         request("#{@model_address}:streamGenerateContent", payload, server_sent_events:, &callback)
       end
