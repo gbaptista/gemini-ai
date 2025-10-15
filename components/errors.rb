@@ -12,6 +12,7 @@ module Gemini
     class UnsupportedServiceError < GeminiError; end
     class ConflictingCredentialsError < GeminiError; end
     class BlockWithoutServerSentEventsError < GeminiError; end
+    class InvalidProvisionedThroughputError < GeminiError; end
 
     class RequestError < GeminiError
       attr_reader :request, :payload

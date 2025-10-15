@@ -129,6 +129,7 @@ Result:
   - [Request Options](#request-options)
     - [Adapter](#adapter)
     - [Timeout](#timeout)
+  - [Provisioned Throughput](#provisioned-throughput)
   - [Error Handling](#error-handling)
     - [Rescuing](#rescuing)
     - [For Short](#for-short)
@@ -1374,6 +1375,41 @@ client = Gemini.new(
 )
 ```
 
+### Provisioned Throughput
+
+You can configure provisioned throughput for your requests to ensure consistent performance and availability. This feature allows you to specify how your requests should be handled in terms of resource allocation.
+
+For more detailed information about Provisioned Throughput, see the [official Google Cloud documentation](https://cloud.google.com/vertex-ai/generative-ai/docs/provisioned-throughput/use-provisioned-throughput?hl=en).
+
+#### Configuration Options
+
+The `provisioned_throughput` option accepts one of three values:
+
+- `dedicated`: Uses dedicated resources for your requests
+- `shared`: Uses shared resources with other users
+- `spillover`: Uses spillover resources when available
+
+Invalid values will raise an `InvalidProvisionedThroughputError`.
+
+#### Example Usage
+
+```ruby
+client = Gemini.new(
+  credentials: {
+    service: 'vertex-ai-api',
+    region: 'your-provisioned-throughput-region'
+  },
+  options: {
+    model: 'your-provisioned-throughput-model',
+    provisioned_throughput: 'dedicated' # or 'shared', 'spillover'
+  }
+)
+```
+
+#### Notes
+
+- Provisioned Throughput is only available for the `vertex-ai-api` service
+- Using this configuration without purchasing and activating Provisioned Throughput may result in 429 errors
 
 ### Error Handling
 
@@ -1424,6 +1460,7 @@ MissingProjectIdError
 UnsupportedServiceError
 ConflictingCredentialsError
 BlockWithoutServerSentEventsError
+InvalidProvisionedThroughputError
 
 RequestError
 ```

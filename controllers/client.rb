@@ -83,6 +83,13 @@ module Gemini
                            else
                              {}
                            end
+
+        @provisioned_throughput = if @service == 'vertex-ai-api'
+                                    config.dig(:options, :provisioned_throughput)
+                                  else
+                                    nil
+                                  end
+        validate_provisioned_throughput! if @provisioned_throughput
       end
 
       def avoid_conflicting_credentials!(credentials)
@@ -98,6 +105,29 @@ module Gemini
 
         raise Errors::ConflictingCredentialsError,
               "You must choose either #{message}."
+      end
+
+      def validate_provisioned_throughput!
+        return unless @provisioned_throughput
+
+        unless @provisioned_throughput.is_a?(String)
+          raise Errors::InvalidProvisionedThroughputError, 
+                'provisioned_throughput must be a string with one of: dedicated, shared, spillover'
+        end
+
+        valid_configs = %w[dedicated shared spillover]
+        unless valid_configs.include?(@provisioned_throughput)
+          raise Errors::InvalidProvisionedThroughputError,
+                "Invalid config '#{@provisioned_throughput}'. Must be one of: #{valid_configs.join(', ')}"
+        end
+      end
+
+      def build_provisioned_throughput_headers
+        return {} unless @provisioned_throughput
+
+        {
+          'X-Vertex-AI-LLM-Request-Type' => @provisioned_throughput
+        }
       end
 
       def predict(payload, server_sent_events: nil, &callback)
@@ -186,9 +216,14 @@ module Gemini
         end.send(method_to_call) do |request|
           request.url url
           request.headers['Content-Type'] = 'application/json'
+          
           if @authentication == :service_account || @authentication == :default_credentials
             request.headers['Authorization'] = "Bearer #{@authorizer.fetch_access_token!['access_token']}"
           end
+
+
+          provisioned_headers = build_provisioned_throughput_headers
+          provisioned_headers.each { |key, value| request.headers[key] = value }
 
           request.body = payload.to_json unless payload.nil?
 
