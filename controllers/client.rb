@@ -159,6 +159,36 @@ module Gemini
         result
       end
 
+      def batch_generate_content(payload, server_sent_events: nil, &callback)
+        result = request(
+          "#{@model_address}:batchGenerateContent",
+          payload,
+          server_sent_events: false,
+          &callback
+        )
+
+        return result.first if result.is_a?(Array) && result.size == 1
+
+        result
+      end
+
+      def batch(name)
+        request(
+          name,
+          nil,
+          server_sent_events: false,
+          request_method: 'GET'
+        )
+      end
+
+      def batch_responses(batch)
+        batch.dig(
+          'response',
+          'inlinedResponses',
+          'inlinedResponses'
+        ) || []
+      end
+
       def request(path, payload, server_sent_events: nil, request_method: 'POST', &callback)
         server_sent_events_enabled = server_sent_events.nil? ? @server_sent_events : server_sent_events
 
