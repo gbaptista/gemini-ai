@@ -65,6 +65,12 @@ Google now supports a [global endpoint](https://cloud.google.com/vertex-ai/gener
 Gemini.new(credentials: { region: 'global' })
 ```
 
+Multi-region locations (`eu` and `us`) are also supported, they use a dedicated `aiplatform.<location>.rep.googleapis.com` hostname:
+
+```ruby
+Gemini.new(credentials: { region: 'eu' })
+```
+
 Result:
 ```ruby
 [{ 'candidates' =>
@@ -372,6 +378,12 @@ Google now supports a [global endpoint](https://cloud.google.com/vertex-ai/gener
 
 ```ruby
 Gemini.new(credentials: { region: 'global' })
+```
+
+Multi-region locations (`eu` and `us`) are also supported, they use a dedicated `aiplatform.<location>.rep.googleapis.com` hostname:
+
+```ruby
+Gemini.new(credentials: { region: 'eu' })
 ```
 
 ## Available Models

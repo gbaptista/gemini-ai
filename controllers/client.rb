@@ -17,6 +17,8 @@ module Gemini
 
       DEFAULT_SERVICE_VERSION = 'v1'
 
+      MULTI_REGIONAL_LOCATIONS = %w[us eu].freeze
+
       def initialize(config)
         @service = config[:credentials][:service]
 
@@ -56,11 +58,7 @@ module Gemini
 
         @base_address = case @service
                         when 'vertex-ai-api'
-                          if config[:credentials][:region] == 'global'
-                            "https://aiplatform.googleapis.com/#{@service_version}/projects/#{@project_id}/locations/#{config[:credentials][:region]}"
-                          else
-                            "https://#{config[:credentials][:region]}-aiplatform.googleapis.com/#{@service_version}/projects/#{@project_id}/locations/#{config[:credentials][:region]}"
-                          end
+                          vertex_ai_base_address(config[:credentials][:region])
                         when 'generative-language-api'
                           "https://generativelanguage.googleapis.com/#{@service_version}"
                         end
@@ -83,6 +81,20 @@ module Gemini
                            else
                              {}
                            end
+      end
+
+      # Vertex AI hostnames, following the official SDKs:
+      # https://github.com/googleapis/js-genai/blob/main/src/_api_client.ts
+      def vertex_ai_base_address(location)
+        host = if location == 'global'
+                 'aiplatform.googleapis.com'
+               elsif MULTI_REGIONAL_LOCATIONS.include?(location)
+                 "aiplatform.#{location}.rep.googleapis.com"
+               else
+                 "#{location}-aiplatform.googleapis.com"
+               end
+
+        "https://#{host}/#{@service_version}/projects/#{@project_id}/locations/#{location}"
       end
 
       def avoid_conflicting_credentials!(credentials)
