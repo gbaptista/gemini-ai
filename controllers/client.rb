@@ -178,16 +178,21 @@ module Gemini
 
         results = []
 
+        # Typhoeus streams the body into on_data without an env and leaves the response body empty, so a
+        # non-200 reply (plain JSON, never an SSE event) would be raised with a blank body. Keep the raw
+        # bytes until the first event parses, so an error can carry them; a successful stream stops there.
+        streamed_body = +''
+
         method_to_call = request_method.to_s.strip.downcase.to_sym
 
-        response = Faraday.new(request: @request_options) do |faraday|
-          faraday.adapter @faraday_adapter
-          faraday.response :raise_error
-        end.send(method_to_call) do |request|
+        response = connection.send(method_to_call) do |request|
           request.url url
           request.headers['Content-Type'] = 'application/json'
           if @authentication == :service_account || @authentication == :default_credentials
-            request.headers['Authorization'] = "Bearer #{@authorizer.fetch_access_token!['access_token']}"
+            # Use apply! instead of fetch_access_token! to leverage googleauth's built-in
+            # token caching. apply! only fetches a new token if the current one is missing
+            # or expires within 60 seconds.
+            @authorizer.apply!(request.headers)
           end
 
           request.body = payload.to_json unless payload.nil?
@@ -202,6 +207,8 @@ module Gemini
                 raise_error = Faraday::Response::RaiseError.new
                 raise_error.on_complete(env.merge(body: chunk))
               end
+
+              streamed_body << chunk if results.empty?
 
               parser.feed(chunk) do |type, data, id, reconnection_time|
                 partial_json += data
@@ -235,14 +242,30 @@ module Gemini
         return safe_parse_json(response.body) unless server_sent_events_enabled
 
         results.map { |result| result[:event] }
-      rescue Faraday::ServerError => e
-        raise Errors::RequestError.new(e.message, request: e, payload:)
+      rescue Faraday::Error => e
+        e.response[:body] = streamed_body if e.response.is_a?(Hash) && e.response_body.to_s.empty?
+        raise Errors::RequestError.new(e.message, request: e, payload:) if e.is_a?(Faraday::ServerError)
+
+        raise
       end
 
       def safe_parse_json(raw)
         raw.to_s.lstrip.start_with?('{', '[') ? JSON.parse(raw) : nil
       rescue JSON::ParserError
         nil
+      end
+
+      private
+
+      def connection
+        @connection ||= build_connection
+      end
+
+      def build_connection
+        Faraday.new(request: @request_options) do |faraday|
+          faraday.adapter @faraday_adapter
+          faraday.response :raise_error
+        end
       end
     end
   end
